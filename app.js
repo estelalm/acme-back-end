@@ -38,7 +38,7 @@ app.get('/v1/AcmeFilmes/filmes', cors(), async function(request, response, next)
     next()
 })
 
-app.get('/v1/AcmeFilmes/filmes/id/:id', cors(), async function( request, response, next) {
+app.get('/v1/AcmeFilmes/filme/:id', cors(), async function( request, response, next) {
 
     let idFilme = request.params.id
     let filmeListado = filmes_funcoes.getFilmesId(idFilme)
