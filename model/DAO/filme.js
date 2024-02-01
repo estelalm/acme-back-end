@@ -1,10 +1,10 @@
-/**********************************************************
+/***********************************************************************
  * Objetivo: Arquivo responsável pela manipulação de dados no Banco SQL;
  *              aqui realizamos o CRUD na linguagem SQL.
  * Data: 01/02/2023
  * Autor: Estela Alves de Moraes
  * Versão: 1.0
-***********************************************************/
+***********************************************************************/
 
 //função para inserir um novo filme no banco de dados
 const insertFilme = async function(){
