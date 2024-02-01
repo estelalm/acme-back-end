@@ -71,6 +71,10 @@ const getFilmesId = function (idFilme) {
 
     JSONfilme.status = status
 
+    if (!status){
+        JSONfilme.erro = "Não foi encontrado nenhum filme"
+    }
+
     return JSONfilme
 }
 
