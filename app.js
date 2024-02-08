@@ -76,10 +76,26 @@ app.get('/v1/AcmeFilmes/filme/:id', cors(), async function( request, response, n
 
 //EndPoint: Versão 2.0 que retorna os dados de filmes do banco de dados
 //Período de utilização: 02/2024
-app.get('v2/AcmeFilmes/filmes', cors(), async function (request, response) {
+app.get('/v2/AcmeFilmes/filmes', cors(), async function (request, response) {
 
     //chama a função da controller para listar todos os filmes
-    let dadosFilmes = controllerFilmes.getListarFilmes()
+    let dadosFilmes = await controllerFilmes.getListarFilmes()
+
+    //validação para verficar se existem dados a serem retornados
+    if(dadosFilmes){
+        response.json(dadosFilmes)
+        response.status(200)
+    }else{
+        response.json({message: 'Nenhum registro encontrado'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/filmes', cors(), async function (request, response) {
+
+    //chama a função da controller para listar todos os filmes
+    let dadosFilmes = await controllerFilmes.getBuscarFilme(id)
 
     //validação para verficar se existem dados a serem retornados
     if(dadosFilmes){
