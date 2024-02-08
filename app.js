@@ -22,7 +22,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const filmes_funcoes = require('./controller/filmes_funcoes.js')
 
 const app = express()
 
@@ -37,6 +36,14 @@ app.use((request,response,next) =>{
     next()
 })
 
+//---------------------  import dos aquivos de controller do projeto ----------------------------------//
+const filmes_funcoes = require('./controller/filmes_funcoes.js')
+const controllerFilmes = require('./controller/controller_filme.js')
+
+
+//----------------------------------------- ENDPOINTS -----------------------------------------//
+//EndPoint: Versão 1.0 que retorna os dados de um arquivo de filmes
+//Período de utilização: 01/2024 - 02/2024
 app.get('/v1/AcmeFilmes/filmes', cors(), async function(request, response, next){
 
     let listaDeFilmes = filmes_funcoes.getFilmes()
@@ -45,13 +52,12 @@ app.get('/v1/AcmeFilmes/filmes', cors(), async function(request, response, next)
         response.json(listaDeFilmes)
         response.status(200)
     }else{
-        response.json({erro:'itens não encntrados'})
+        response.json({erro:'itens não encontrados'})
         response.status(404)
     }
 
     next()
 })
-
 app.get('/v1/AcmeFilmes/filme/:id', cors(), async function( request, response, next) {
 
     let idFilme = request.params.id
@@ -61,12 +67,31 @@ app.get('/v1/AcmeFilmes/filme/:id', cors(), async function( request, response, n
         response.json(filmeListado)
         response.status(200)
     }else{
-        response.json({erro:'itens não encntrados'})
+        response.json({erro:'itens não encontrados'})
         response.status(404)
     }
 
     next()
 })
+
+//EndPoint: Versão 2.0 que retorna os dados de filmes do banco de dados
+//Período de utilização: 02/2024
+app.get('v2/AcmeFilmes/filmes', cors(), async function (request, response) {
+
+    //chama a função da controller para listar todos os filmes
+    let dadosFilmes = controllerFilmes.getListarFilmes()
+
+    //validação para verficar se existem dados a serem retornados
+    if(dadosFilmes){
+        response.json(dadosFilmes)
+        response.status(200)
+    }else{
+        response.json({message: 'Nenhum registro encontrado'})
+        response.status(404)
+    }
+
+})
+
 
 app.listen('8080', () =>{
     console.log('API funcionando')
