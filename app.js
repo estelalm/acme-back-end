@@ -5,6 +5,20 @@
  * Versão: 1.0
  ***********************************************************/
 
+/**
+ * Para realizar a integração com o banco de dados, devemos utiizar uma das seguintes bibliotecas:
+ *      Sequelize - mais antiga
+ *      Prisma ORM - mais atual, que será utlizada no projeto
+ *      Fastfy ORM
+ * 
+ *      Para a instalação do PRISMA ORM:
+ *      npm install prisma --save  (responsável pela conexão com o banco de dados)
+ *      npm install @prisma/client (responável por executar scripts SQL no banco)
+ *       - Para inicializar : 
+ *      npx prisma init
+ */
+
+
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')

@@ -6,6 +6,13 @@
  * Versão: 1.0
 ***********************************************************************/
 
+
+//Import da biblioteca do prisma client
+const { PrismaClient } = require('@prisma/client')
+
+//Instância da classe prisma client
+const prisma = new PrismaClient
+
 //função para inserir um novo filme no banco de dados
 const insertFilme = async function(){
 
@@ -23,6 +30,18 @@ const deleteFilme = async function (){
 
 //função para listar todos os filmes banco de dados
 const selectAllFilmes = async function (){
+
+    let sql = 'select * from tbl_filme'
+
+    //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
+    // $queryRawUnsafe(sql) -> possibilita enviar uma variável
+    // $queryRaw('select * from tbl_filme') -> colocar script no argumento
+    let rsFilmes = await prisma.$queryRawUnsafe(sql) 
+
+    if(rsFilmes.length > 0)
+    return rsFilmes
+    else
+    return false
 
 }
 
