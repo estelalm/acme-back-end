@@ -15,17 +15,14 @@ const prisma = new PrismaClient
 
 //função para inserir um novo filme no banco de dados
 const insertFilme = async function(){
-
 }
 
 //função para atualizar um filme no banco de dados
 const updateFilme = async function(){
-
 }
 
 //função para excluir um filme do banco de dados
 const deleteFilme = async function (){
-
 }
 
 //função para listar todos os filmes banco de dados
@@ -57,10 +54,36 @@ const selectByIdFilme = async function (id){
     return false
 }
 
+const selectByNomeFilme = async function (nome){
+    let sql = `select * from tbl_filme where nome like '%${nome}%'`
+
+    let rsFilmes = await prisma.$queryRawUnsafe(sql)
+
+    if(rsFilmes.length > 0)
+    return rsFilmes
+    else
+    return false
+}
+
+let params = { nome: 'all', id: '2' }
+
+const selectByFIltro = async function(params){
+
+    let sql = `select * from tbl_filme where`
+
+
+    params.forEach(parametro =>{
+    console.log(parametro)
+    })
+
+}
+selectByFIltro()
+
 module.exports ={
     insertFilme,
     updateFilme,
     deleteFilme,
     selectAllFilmes,
-    selectByIdFilme
+    selectByIdFilme,
+    selectByNomeFilme
 }

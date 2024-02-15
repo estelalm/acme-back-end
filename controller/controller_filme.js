@@ -10,6 +10,7 @@ const filmesDAO = require('../model/DAO/filme.js')
 
 //função para inserir um novo filme
 const setInserirNovoFilme =async function (){
+
 }  
 
 //função para atualizar um filme
@@ -48,12 +49,11 @@ const getBuscarFilme = async function (idFilme){
     let filmeJSON = {}
 
     //chama a função do DAO que retorna os filmes do banco
-    let dadosFilme = await filmesDAO.selectByIdFilme(1)
+    let dadosFilme = await filmesDAO.selectByIdFilme(idFilme)
     //validação para verificar se o DAO retornou dados
     if(dadosFilme){
        //cria os atributos para reornar ao app
        filmeJSON.filmes = dadosFilme
-       filmeJSON.quantidade = dadosFilme.length
        filmeJSON.status_code = 200
        
        return filmeJSON
@@ -63,10 +63,28 @@ const getBuscarFilme = async function (idFilme){
 
 }
 
+const getBuscarNomeFilme = async function (nomeFilme){
+
+    let filmesJSON = {}
+
+    let dadosFilmes = await filmesDAO.selectByNomeFilme(nomeFilme)
+
+    if(dadosFilmes){
+        filmesJSON.filmes = dadosFilmes
+        filmesJSON.quantidade = dadosFilmes.length
+        filmesJSON.status_code = 200
+
+        return filmesJSON
+    }else{
+        return false
+    }
+}
+
 module.exports = {
     setInserirNovoFilme,
     setAtualizarFilme,
     setExcluirFilme,
     getListarFilmes,
-    getBuscarFilme
+    getBuscarFilme,
+    getBuscarNomeFilme
 }
