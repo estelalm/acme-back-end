@@ -28,56 +28,79 @@ const deleteFilme = async function (){
 //função para listar todos os filmes banco de dados
 const selectAllFilmes = async function (){
 
-    let sql = 'select * from tbl_filme'
+    try{
+        let sql = 'select * from tbl_filme'
 
-    //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
-    // $queryRawUnsafe(sql) -> possibilita enviar uma variável
-    // $queryRaw('select * from tbl_filme') -> colocar script no argumento
-    let rsFilmes = await prisma.$queryRawUnsafe(sql) 
-
-    if(rsFilmes.length > 0)
-    return rsFilmes
-    else
+        //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
+        // $queryRawUnsafe(sql) -> possibilita enviar uma variável
+        // $queryRaw('select * from tbl_filme') -> colocar script no argumento
+        let rsFilmes = await prisma.$queryRawUnsafe(sql) 
+    
+        return rsFilmes
+    }catch(error){
     return false
+    }
 
 }
 
 //função para buscar um filme do banco de dados pelo id
 const selectByIdFilme = async function (id){
-    let sql = 'select * from tbl_filme where id = ' + id
 
-    let rsFilmes = await prisma.$queryRawUnsafe(sql) 
+    try {
+        let sql = `select * from tbl_filme where id =  ${id}`
+        //encaminha o script da variável sql para o banco de dados
+        let rsFilmes = await prisma.$queryRawUnsafe(sql) 
 
-    if(rsFilmes.length > 0)
-    return rsFilmes
-    else
-    return false
+         return rsFilmes
+    } catch (error) {
+        return false
+    }
+
+
 }
 
-const selectByNomeFilme = async function (nome){
-    let sql = `select * from tbl_filme where nome like '%${nome}%'`
+const selectByNomeFilme = async function (nomeFilme){
 
-    let rsFilmes = await prisma.$queryRawUnsafe(sql)
-
-    if(rsFilmes.length > 0)
-    return rsFilmes
-    else
-    return false
-}
-
-let params = { nome: 'all', id: '2' }
-
-const selectByFIltro = async function(params){
-
-    let sql = `select * from tbl_filme where`
-
-
-    params.forEach(parametro =>{
-    console.log(parametro)
-    })
+    let nome = nomeFilme.replaceAll('"', '')
+    try{
+        let sql = `select * from tbl_filme where nome like '%${nome}%'`
+        let rsFilme = await prisma.$queryRawUnsafe(sql)
+        return rsFilme
+    }catch(error){
+        return false
+    }
 
 }
-selectByFIltro()
+
+
+
+///// testes -> tentando usar os parâmetros na query
+let params = { nome: "all", valor_unitario: 26, id: 2 }
+
+const selectByFiltro = async function(params){
+
+    try {
+        let keys = Object.keys(params)
+
+        let condition
+        keys.forEach(async key =>{
+            if(condition){
+                condition += ` and ${key} like "%${params[key]}%"`
+            }else{
+                condition = `${key} like "%${params[key]}%"`
+            }
+    
+            let sql = `select * from tbl_filme where ${condition}`
+            let rsFilmes = await prisma.$queryRawUnsafe(sql)
+            return rsFilmes
+        })
+    } catch (error) {
+        return false
+    }
+
+
+}
+selectByFiltro(params)
 
 module.exports ={
     insertFilme,
@@ -85,5 +108,6 @@ module.exports ={
     deleteFilme,
     selectAllFilmes,
     selectByIdFilme,
-    selectByNomeFilme
+    selectByNomeFilme,
+    selectByFiltro
 }

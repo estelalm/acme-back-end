@@ -5,7 +5,8 @@
  * Versão: 1.0
 ***********************************************************************/
 
-//
+//import do arquivo de configuração do projeto
+const message = require('../modulo/config.js')
 const filmesDAO = require('../model/DAO/filme.js')
 
 //função para inserir um novo filme
@@ -32,19 +33,34 @@ const getListarFilmes = async function (){
      //validação para verificar se o DAO retornou dados
      if(dadosFilmes){
         //cria os atributos para reornar ao app
-        filmesJSON.filmes = dadosFilmes
-        filmesJSON.quantidade = dadosFilmes.length
-        filmesJSON.status_code = 200
-        
-        return filmesJSON
+
+        if(dadosFilmes.length > 0){
+            filmesJSON.filmes = dadosFilmes
+            filmesJSON.quantidade = dadosFilmes.length
+            filmesJSON.status_code = 200
+            
+            return filmesJSON
+        }else{
+            return message.ERROR_NOT_FOUND
+        }
+
     }else{
-        return false
+        return message.ERROR_INTERNAL_SERVER_DB
     }
 
 }
 
 //função para buscar um filme pelo id
-const getBuscarFilme = async function (idFilme){
+const getBuscarFilme = async function (id){
+    
+    let idFilme = id
+
+    //validação do id
+    if(idFilme == "" || idFilme == undefined || isNaN(idFilme)){
+        //caso seja inválido, envia a mensagem da confi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+        return message.ERROR_INVALID_ID
+    }else{
+    
     //cria um objeto json
     let filmeJSON = {}
 
@@ -53,31 +69,80 @@ const getBuscarFilme = async function (idFilme){
     //validação para verificar se o DAO retornou dados
     if(dadosFilme){
        //cria os atributos para reornar ao app
-       filmeJSON.filmes = dadosFilme
-       filmeJSON.status_code = 200
+
+       if(dadosFilme.length > 0){
+
+        filmeJSON.filme = dadosFilme
+        filmeJSON.status_code = 200
+
+        return filmeJSON
+    
+       }else{
+        return message.ERROR_NOT_FOUND
+       }
        
-       return filmeJSON
    }else{
-       return false
+       return message.ERROR_INTERNAL_SERVER_DB
    }
+}
 
 }
 
-const getBuscarNomeFilme = async function (nomeFilme){
+const getBuscarNomeFilme = async function (nome){
 
-    let filmesJSON = {}
-
-    let dadosFilmes = await filmesDAO.selectByNomeFilme(nomeFilme)
-
-    if(dadosFilmes){
-        filmesJSON.filmes = dadosFilmes
-        filmesJSON.quantidade = dadosFilmes.length
-        filmesJSON.status_code = 200
-
-        return filmesJSON
+    let nomeFilme = nome
+    if(nomeFilme == ""){
+        return message.ERROR_INVALID_VALUE
     }else{
-        return false
+        let filmesJSON = {}
+
+        let dadosFilmes = await filmesDAO.selectByNomeFilme(nomeFilme)
+    
+        if(dadosFilmes){
+    
+            if(dadosFilmes.length > 0){
+                filmesJSON.filmes = dadosFilmes
+                filmesJSON.quantidade = dadosFilmes.length
+                filmesJSON.status_code = 200
+        
+                return filmesJSON
+            }else{
+                return message.ERROR_NOT_FOUND
+            }
+    
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB
+        }
     }
+   
+}
+
+const getFiltrarFilmes = async function(parametros){
+
+    if(parametros == ""){
+        return message.ERROR_INVALID_VALUE
+    }else{
+        let filmesJSON = {}
+
+        let dadosFilmes = await filmesDAO.selectByFiltro(parametros)
+    
+        if(dadosFilmes){
+    
+            if(dadosFilmes.length > 0){
+                filmesJSON.filmes = dadosFilmes
+                filmesJSON.quantidade = dadosFilmes.length
+                filmesJSON.status_code = 200
+        
+                return filmesJSON
+            }else{
+                return message.ERROR_NOT_FOUND
+            }
+    
+        }else{
+            return message.ERROR_INTERNAL_SERVER_DB
+        }
+    }
+
 }
 
 module.exports = {
@@ -86,5 +151,6 @@ module.exports = {
     setExcluirFilme,
     getListarFilmes,
     getBuscarFilme,
-    getBuscarNomeFilme
+    getBuscarNomeFilme,
+    getFiltrarFilmes
 }

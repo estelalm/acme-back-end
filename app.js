@@ -82,13 +82,12 @@ app.get('/v2/AcmeFilmes/filmes', cors(), async function (request, response) {
     let dadosFilmes = await controllerFilmes.getListarFilmes()
 
     //validação para verficar se existem dados a serem retornados
-    if(dadosFilmes){
+
         response.json(dadosFilmes)
         response.status(200)
-    }else{
+
         response.json({message: 'Nenhum registro encontrado'})
         response.status(404)
-    }
 
 })
 
@@ -97,49 +96,32 @@ app.get('/v2/AcmeFilmes/filme/:id', cors(), async function (request, response) {
     let idFilme = request.params.id
 
     //chama a função da controller para listar o filme com id correspondente
-    let dadosFilmes = await controllerFilmes.getBuscarFilme(idFilme)
+    let dadosFilme = await controllerFilmes.getBuscarFilme(idFilme)
 
-    //validação para verficar se existem dados a serem retornados
-    if(dadosFilmes){
-        response.json(dadosFilmes)
-        response.status(200)
-    }else{
-        response.json({message: 'Nenhum registro encontrado'})
-        response.status(404)
-    }
+        response.status(dadosFilme.status_code)
+        response.json(dadosFilme)
 
 })
 
 app.get('/v2/AcmeFilmes/filmes/filtro', cors(), async function(request, response){
 
     let nomeFilme = request.query.nome
-    console.log(request.query)
 
     //chama a função da controller para listar o filme com nome correspondente
     let dadosFilmes = await controllerFilmes.getBuscarNomeFilme(nomeFilme)
 
-    if(dadosFilmes){
         response.json(dadosFilmes)
         response.status(200)
-    }else{
-        response.json({message: 'Nenhum registro encontrado'})
-        response.status(404)
-    }
 })
 
 app.get('/v2/AcmeFilmes/filmes/filtros/', cors(), async function(request, response){
 
     let params = request.query
 
-    let dadosFilmes = await controllerFilmes.getBuscarFilmeFiltros(params)
+    let dadosFilmes = await controllerFilmes.getFiltrarFilmes(params)
 
-    if(dadosFilmes){
         response.json(dadosFilmes)
         response.status(200)
-    }else{
-        response.json({message: 'Nenhum registro encontrado'})
-        response.status(404)
-    }
 })
 
 app.listen('8080', () =>{
