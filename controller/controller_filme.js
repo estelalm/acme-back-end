@@ -12,6 +12,8 @@ const filmesDAO = require('../model/DAO/filme.js')
 //função para inserir um novo filme
 const setInserirNovoFilme =async function (){
 
+    
+
 }  
 
 //função para atualizar um filme

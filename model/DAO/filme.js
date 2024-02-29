@@ -14,7 +14,33 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient
 
 //função para inserir um novo filme no banco de dados
-const insertFilme = async function(){
+const insertFilme = async function(dadosFilme){
+
+    try{
+        let sql = `insert into tbl_filme (  nome, 
+            sinopse, 
+            duracao,
+            data_lancamento,
+            data_relancamento,
+            foto_capa,
+            valor_unitario
+)values (
+            '${dadosFilme.nome}',
+            '${dadosFilme.sinopse}',
+            '${dadosFilme.duracao}',
+            '${dadosFilme.data_lancamento}',
+            '${dadosFilme.data_relancamento}',
+            '${dadosFilme.foto_capa}',
+             ${dadosFilme.valor_unitario}
+
+)`
+
+//$executeRawUnsafe( - serve para executar scripts sem retorno de dados (insert, update e delete))
+let result = await prisma.$executeRawUnsafe(sql)
+    }catch(error){
+        return false
+    }
+    
 }
 
 //função para atualizar um filme no banco de dados
@@ -35,7 +61,6 @@ const selectAllFilmes = async function (){
         // $queryRawUnsafe(sql) -> possibilita enviar uma variável
         // $queryRaw('select * from tbl_filme') -> colocar script no argumento
         let rsFilmes = await prisma.$queryRawUnsafe(sql) 
-    
         return rsFilmes
     }catch(error){
     return false
@@ -72,11 +97,6 @@ const selectByNomeFilme = async function (nomeFilme){
 
 }
 
-
-
-///// testes -> tentando usar os parâmetros na query
-let params = { nome: 'all', valor_unitario: '26', id: 2 }
-
 const selectByFiltro = async function(params){
 
     try {
@@ -99,7 +119,6 @@ const selectByFiltro = async function(params){
     }
 
 }
-
 
 module.exports ={
     insertFilme,
