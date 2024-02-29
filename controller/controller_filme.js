@@ -20,12 +20,28 @@ const setInserirNovoFilme = async function (dadosFilme){
         dadosFilme.sinopse == "" || dadosFilme.sinopse == undefined || dadosFilme.sinopse.length > 65000 ||
         dadosFilme.duracao == "" || dadosFilme.duracao == undefined || dadosFilme.duracao.length > 8 ||
         dadosFilme.data_lancamento == "" || dadosFilme.data_lancamento == undefined || dadosFilme.data_lancamento.length != 10 ||
-        dadosFilme.data_relancamento.length != 10 ||
         dadosFilme.foto_capa == "" || dadosFilme.foto_capa == undefined || dadosFilme.foto_capa.length > 200 ||
         dadosFilme.valor_unitario.length > 6
-      ){
+    ){
         return message.ERROR_REQUIRED_FIELDS
-       }else{
+      } else{
+
+        let validateStatus = false
+
+        if( dadosFilme.data_relancamento != null || dadosFilme.data_relancamento != ""){
+            
+            if(dadosFilme.data_relancamento.length != 10)
+            return message.ERROR_REQUIRED_FIELDS //400
+            else
+            validateStatus = true
+
+        }else{
+            validateStatus = true
+        }
+
+        if(validateStatus){
+
+        }
 
         //encaminhando os dados do filme para o DAO inserir no banco de dados
         let novoFilme = await filmesDAO.insertFilme(dadosFilme)
