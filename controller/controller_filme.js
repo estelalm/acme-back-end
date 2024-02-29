@@ -118,7 +118,6 @@ const getBuscarNomeFilme = async function (nome){
 }
 
 const getFiltrarFilmes = async function(parametros){
-
     if(parametros == ""){
         return message.ERROR_INVALID_VALUE
     }else{
@@ -132,7 +131,7 @@ const getFiltrarFilmes = async function(parametros){
                 filmesJSON.filmes = dadosFilmes
                 filmesJSON.quantidade = dadosFilmes.length
                 filmesJSON.status_code = 200
-        
+
                 return filmesJSON
             }else{
                 return message.ERROR_NOT_FOUND

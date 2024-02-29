@@ -75,13 +75,13 @@ const selectByNomeFilme = async function (nomeFilme){
 
 
 ///// testes -> tentando usar os parâmetros na query
-let params = { nome: "all", valor_unitario: 26, id: 2 }
+let params = { nome: 'all', valor_unitario: '26', id: 2 }
 
 const selectByFiltro = async function(params){
 
     try {
         let keys = Object.keys(params)
-
+        let rsFilmes
         let condition
         keys.forEach(async key =>{
             if(condition){
@@ -89,18 +89,17 @@ const selectByFiltro = async function(params){
             }else{
                 condition = `${key} like "%${params[key]}%"`
             }
-    
-            let sql = `select * from tbl_filme where ${condition}`
-            let rsFilmes = await prisma.$queryRawUnsafe(sql)
-            return rsFilmes
         })
+            let sql = `select * from tbl_filme where ${condition}`
+            rsFilmes = await prisma.$queryRawUnsafe(sql)
+            return rsFilmes
+
     } catch (error) {
         return false
     }
 
-
 }
-selectByFiltro(params)
+
 
 module.exports ={
     insertFilme,
