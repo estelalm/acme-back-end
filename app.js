@@ -29,17 +29,21 @@ app.use(express.json())
 app.use((request,response,next) =>{
 
     response.header('Access-Control-Allow-origin', '*')
-    response.header('Acesss-Control-Allow-Methods', 'GET')
+    response.header('Acesss-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     request.header('Content-Type', 'application/json')
     app.use(cors())
 
     next()
 })
 
+
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
+//---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
+//criando um objeto para controlar a chegada dos dados da reqisição em formato JSON
+const bodyParserJSON = bodyParser.json()
 
 //----------------------------------------- ENDPOINTS -----------------------------------------//
 //EndPoint: Versão 1.0 que retorna os dados de um arquivo de filmes
@@ -122,6 +126,21 @@ app.get('/v2/AcmeFilmes/filmes/filtros/', cors(), async function(request, respon
 
         response.json(dadosFilmes)
         response.status(200)
+})
+
+
+
+app.post('/v2/AcmeFilmes/filme', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoFilme = await controllerFilmes.setInserirNovoFilme(dadosBody)
+
+    
+    response.status(resultDadosNovoFilme.status_code)
+    response.json(resultDadosNovoFilme)
 })
 
 app.listen('8080', () =>{
