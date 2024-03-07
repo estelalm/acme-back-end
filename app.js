@@ -87,11 +87,15 @@ app.get('/v2/AcmeFilmes/filmes', cors(), async function (request, response) {
 
     //validação para verficar se existem dados a serem retornados
 
+    if(dadosFilmes){
         response.json(dadosFilmes)
         response.status(200)
+    }else{
 
         response.json({message: 'Nenhum registro encontrado'})
         response.status(404)
+
+    }
 
 })
 
@@ -129,7 +133,7 @@ app.get('/v2/AcmeFilmes/filmes/filtros/', cors(), async function(request, respon
 })
 
 
-
+//insert
 app.post('/v2/AcmeFilmes/filme', cors(), bodyParserJSON, async function(request, response){
 
     //recebe todos os dados enviados na requisição pelo body
