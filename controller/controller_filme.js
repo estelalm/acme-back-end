@@ -47,6 +47,7 @@ const setInserirNovoFilme = async function (dadosFilme) {
             let novoFilme = await filmesDAO.insertFilme(dadosFilme)
             let idNovoFilme = await filmesDAO.selectLastInsertId()
 
+            
             //validação para verificar se o DAO inseriu os dados no banco
             if (novoFilme) {
                 //cria o JSON de retorno dos dados (201)
