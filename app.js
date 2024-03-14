@@ -136,15 +136,44 @@ app.get('/v2/AcmeFilmes/filmes/filtros/', cors(), async function(request, respon
 //insert
 app.post('/v2/AcmeFilmes/filme', cors(), bodyParserJSON, async function(request, response){
 
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
     //recebe todos os dados enviados na requisição pelo body
     let dadosBody = request.body
 
     //encaminha os dados para a controller enviar para o DAO
-    let resultDadosNovoFilme = await controllerFilmes.setInserirNovoFilme(dadosBody)
-
+    let resultDadosNovoFilme = await controllerFilmes.setInserirNovoFilme(dadosBody, contentType)
     
     response.status(resultDadosNovoFilme.status_code)
     response.json(resultDadosNovoFilme)
+
+})
+
+//delete
+app.delete('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idFilme = request.params.id
+
+    let filmeDeletado = await controllerFilmes.setExcluirFilme(idFilme)
+
+    response.json(filmeDeletado)
+    response.status(filmeDeletado.status_code)
+})
+
+
+app.put('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idFilme = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let filmeAtualizado = await controllerFilmes.setAtualizarFilme(idFilme, dadosBody, contentType)
+
+    response.json(filmeAtualizado)
+    response.status(filmeAtualizado.status_code)
 })
 
 app.listen('8080', () =>{

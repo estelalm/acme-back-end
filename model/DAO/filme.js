@@ -21,7 +21,7 @@ const insertFilme = async function (dadosFilme) {
     try {
 
         if (dadosFilme.data_relancamento != null && dadosFilme.data_relancamento != "" && dadosFilme.data_relancamento != undefined) {
-            sql = `insert into tbl_filme (  nome, 
+            sql = `insert into tbl_filme ( nome, 
                 sinopse, 
                 duracao,
                 data_lancamento,
@@ -39,7 +39,7 @@ const insertFilme = async function (dadosFilme) {
     
         )`
         } else {
-            sql = `insert into tbl_filme (  nome, 
+            sql = `insert into tbl_filme ( nome, 
                 sinopse, 
                 duracao,
                 data_lancamento,
@@ -75,13 +75,52 @@ const insertFilme = async function (dadosFilme) {
 }
 
 //função para atualizar um filme no banco de dados
-const updateFilme = async function () {
+const updateFilme = async function (id, dados) {
 
-    let campo
-    let valorNovo
-    let idFilme
+    let idFilme = id
+    let dadosFilme = dados
 
-    let sql = `update tbl_filme set ${campo} = ${valorNovo} where id = ${idFilme}`
+    try{
+
+        let sql
+
+        if (dadosFilme.data_relancamento != null && dadosFilme.data_relancamento != "" && dadosFilme.data_relancamento != undefined){
+
+        sql = `update tbl_filme set 
+        
+            nome = '${dadosFilme.nome}',
+            sinopse = '${dadosFilme.sinopse}', 
+            duracao = '${dadosFilme.duracao}',
+            data_lancamento = '${dadosFilme.data_lancamento}',
+            data_relancamento = ${dadosFilme.data_relancamento},
+            foto_capa = '${dadosFilme.foto_capa}',
+            valor_unitario = ${dadosFilme.valor_unitario}
+        
+            where id = ${idFilme}`
+    }else{
+        sql = `update tbl_filme set 
+        
+        nome = '${dadosFilme.nome}',
+        sinopse = '${dadosFilme.sinopse}', 
+        duracao = '${dadosFilme.duracao}',
+        data_lancamento = '${dadosFilme.data_lancamento}',
+        data_relancamento = null,
+        foto_capa = '${dadosFilme.foto_capa}',
+        valor_unitario = ${dadosFilme.valor_unitario}
+    
+        where id = ${idFilme}`
+    }
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if(result)
+        return true
+        else
+        return false
+
+    }catch(error){
+        return false
+    }
 }
 
 //função para excluir um filme do banco de dados
@@ -93,7 +132,6 @@ const deleteFilme = async function (id) {
         let sql = `delete from tbl_filme where id = ${idFilme}`
 
         let result = await prisma.$executeRawUnsafe(sql)
-
 
         if (result)
             return true
@@ -207,5 +245,7 @@ module.exports = {
     selectByIdFilme,
     selectByNomeFilme,
     selectByFiltro,
-    selectLastInsertId
+    selectLastInsertId,
+    deleteFilme,
+    updateFilme
 }
