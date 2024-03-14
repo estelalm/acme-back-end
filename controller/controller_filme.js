@@ -156,9 +156,6 @@ const setExcluirFilme = async function (id) {
 
         let idFilme = id
 
-        let getFilmeDeletado = await getBuscarFilme(idFilme)
-        console.log(getFilmeDeletado)
-
         if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
             //caso seja inválido, envia a mensagem da config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
             return message.ERROR_INVALID_ID
@@ -166,19 +163,14 @@ const setExcluirFilme = async function (id) {
             let filmeDeletado = await filmesDAO.deleteFilme(idFilme)
 
             if (filmeDeletado) {
-                //cria o JSON de retorno dos dados (201)
-                filmeDeletadoJSON.filme_deletado = getFilmeDeletado.filme[0]
-                filmeDeletadoJSON.status = message.SUCCESS_DELETED_ITEM.status
-                filmeDeletadoJSON.status_code = message.SUCCESS_DELETED_ITEM.status_code
-                filmeDeletadoJSON.message = message.SUCCESS_DELETED_ITEM.message
-
-                return filmeDeletadoJSON //201
+                return message.SUCCESS_DELETED_ITEM //201
 
             } else {
                 return message.ERROR_INTERNAL_SERVER_DB //500: erro no banco de dados
             }
         }
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER //500: erro na controller
     }
 
