@@ -27,7 +27,8 @@ const insertFilme = async function (dadosFilme) {
                 data_lancamento,
                 data_relancamento,
                 foto_capa,
-                valor_unitario
+                valor_unitario,
+                trailer
         )values (
                 '${dadosFilme.nome}',
                 '${dadosFilme.sinopse}',
@@ -35,7 +36,8 @@ const insertFilme = async function (dadosFilme) {
                 '${dadosFilme.data_lancamento}',
                 '${dadosFilme.data_relancamento}',
                 '${dadosFilme.foto_capa}',
-                 ${dadosFilme.valor_unitario}
+                 ${dadosFilme.valor_unitario},
+                '${dadosFilme.trailer}'
     
         )`
         } else {
@@ -148,7 +150,17 @@ const deleteFilme = async function (id) {
 const selectAllFilmes = async function () {
 
     try {
-        let sql = 'select * from tbl_filme'
+        let sql = `select max(tbl_filme.id) as id, tbl_filme.nome, max(sinopse) as sinopse, max(duracao) as duracao, max(data_lancamento) as data_lancamento, 
+        max(valor_unitario) as valor_unitario, max(foto_capa) as foto_capa, max(trailer) as trailer, 
+        max(tbl_classificacao.nome) as classificacao , max(tbl_paises.nome) as pais_origem,
+         group_concat(distinct tbl_genero.nome separator "/") as generos,  
+         group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
+         group_concat(distinct tbl_ator.nome separator ", ") as elenco from tbl_filme
+        inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
+        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.tbl_filme_id inner join tbl_diretor on tbl_diretor_filme.tbl_diretor_id=tbl_diretor.id
+        inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
+        join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
+        join tbl_paises on tbl_filme.pais_origem_id=tbl_paises.id group by tbl_filme.nome`
 
         //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
         // $queryRawUnsafe(sql) -> possibilita enviar uma variável
@@ -156,6 +168,7 @@ const selectAllFilmes = async function () {
         let rsFilmes = await prisma.$queryRawUnsafe(sql)
         return rsFilmes
     } catch (error) {
+        console.log(error)
         return false
     }
 
@@ -165,7 +178,17 @@ const selectAllFilmes = async function () {
 const selectByIdFilme = async function (id) {
 
     try {
-        let sql = `select * from tbl_filme where id =  ${id}`
+        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, 
+        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_paises.nome as pais_origem,
+         group_concat(distinct tbl_genero.nome separator "/") as generos,  
+         group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
+         group_concat(distinct tbl_ator.nome separator ", ") as elenco from tbl_filme
+        inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
+        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.tbl_filme_id inner join tbl_diretor on tbl_diretor_filme.tbl_diretor_id=tbl_diretor.id
+        inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
+        join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
+        join tbl_paises on tbl_filme.pais_origem_id=tbl_paises.id where tbl_filme.id = ${id}`
+        
         //encaminha o script da variável sql para o banco de dados
         let rsFilmes = await prisma.$queryRawUnsafe(sql)
 

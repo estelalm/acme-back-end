@@ -84,6 +84,7 @@ const setInserirNovoFilme = async function (dadosFilme, contentType) {
 const setAtualizarFilme = async function (id, dadosFilme, contentType) {
 
     try {
+        
         let idFilme = id
         if (String(contentType).toLowerCase() == 'application/json') {
             if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
@@ -200,9 +201,11 @@ const getListarFilmes = async function () {
             }
 
         } else {
+            
             return message.ERROR_INTERNAL_SERVER_DB
         }
     } catch (error) {
+        
         return message.ERROR_INTERNAL_SERVER //500: erro na controller
     }
 }
