@@ -40,6 +40,7 @@ app.use((request,response,next) =>{
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
+const controllerGeneros = require('./controller/controller_generos.js')
 const controllerUsuarios = require('./controller/controller_usuario.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
@@ -181,6 +182,51 @@ app.put('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(reque
 
 
 })
+
+///////////////////// GÊNEROS ///////////////////////////
+
+app.get('/v2/AcmeFilmes/generos', cors(), async function (request, response){
+
+    let listaDeGeneros = await controllerGeneros.getListarGeneros()
+
+    if(listaDeGeneros){
+        response.json(listaDeGeneros)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/genero/:id', cors(), async function (request, response){
+
+    let idGenero = request.params.id
+
+    let genero = await controllerGeneros.getBuscarGenero(idGenero)
+
+    if(genero){
+        response.json(genero)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.post('/v2/AcmeFilmes/genero', cors(), bodyParserJSON, async function(request, response){
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let resultNovoGenero = await controllerGeneros.setInserirNovogenero(dadosBody, contentType)
+
+    response.status(resultNovoGenero.status_code)
+    response.json(resultNovoGenero)
+})
+
 
 //////////////////// USUÁRIOS ///////////////////
 
