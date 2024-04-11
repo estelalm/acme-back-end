@@ -67,10 +67,11 @@ const getBuscarGenero = async (id) => {
 
 }
 
-const setInserirNovogenero = async (dadosGenero, contentType) =>{
+const setInserirNovoGenero = async (dadosGenero, contentType) =>{
 
     try {
-        if(String(contentType).toLowerCase == 'application/json'){
+
+        if(String(contentType).toLowerCase() == 'application/json'){
 
             let novoGeneroJSON = {}
 
@@ -78,7 +79,6 @@ const setInserirNovogenero = async (dadosGenero, contentType) =>{
             dadosGenero.nome == null || dadosGenero.nome.length > 45){
                 return message.ERROR_REQUIRED_FIELDS
             }else{
-
                     let novoGenero = await generosDAO.insertGenero(dadosGenero)
                     let novoId = await generosDAO.selectLastInsertId()
 
@@ -95,17 +95,24 @@ const setInserirNovogenero = async (dadosGenero, contentType) =>{
                         return message.ERROR_INTERNAL_SERVER_DB
                     }
             }
+        }else{
+            return message.ERROR_CONTENT_TYPE
         }
         
     } catch (error) {
+
         return message.ERROR_INTERNAL_SERVER
     }
 
 }
 
 
+
+
 module.exports = {
     getListarGeneros,
     getBuscarGenero,
-    setInserirNovogenero
+    setInserirNovoGenero,
+    setExcluirGenero,
+    setAtualizarGenero
 }

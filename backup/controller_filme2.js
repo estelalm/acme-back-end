@@ -26,9 +26,7 @@ const setInserirNovoFilme = async function (dadosFilme, contentType) {
                 dadosFilme.data_lancamento == "" || dadosFilme.data_lancamento == undefined || dadosFilme.data_lancamento == null || dadosFilme.data_lancamento.length != 10 ||
                 dadosFilme.foto_capa == "" || dadosFilme.foto_capa == undefined || dadosFilme.foto_capa == null || dadosFilme.foto_capa.length > 200 ||
                 dadosFilme.trailer == "" || dadosFilme.trailer == undefined || dadosFilme.trailer == null || dadosFilme.trailer.length > 200 ||
-                dadosFilme.classificacao == undefined || dadosFilme.classificacao == "" || isNaN(dadosFilme.classificacao) ||
-                dadosFilme.pais_origem == undefined || dadosFilme.pais_origem == "" || isNaN(dadosFilme.pais_origem)
-                || dadosFilme.valor_unitario.length > 6
+                dadosFilme.valor_unitario.length > 6
             ) {
                 return message.ERROR_REQUIRED_FIELDS
             } else {

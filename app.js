@@ -41,6 +41,7 @@ app.use((request,response,next) =>{
 const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
 const controllerGeneros = require('./controller/controller_generos.js')
+const controlerClassificacoes = require('./controller/controller_classificacao.js')
 const controllerUsuarios = require('./controller/controller_usuario.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
@@ -221,11 +222,112 @@ app.post('/v2/AcmeFilmes/genero', cors(), bodyParserJSON, async function(request
 
     let dadosBody = request.body
 
-    let resultNovoGenero = await controllerGeneros.setInserirNovogenero(dadosBody, contentType)
+    let resultNovoGenero = await controllerGeneros.setInserirNovoGenero(dadosBody, contentType)
 
-    response.status(resultNovoGenero.status_code)
+    // response.status(resultNovoGenero.status_code)
     response.json(resultNovoGenero)
 })
+
+app.put('/v2/AcmeFilmes/genero/:id', cors(), bodyParserJSON, async  function(request, response){
+
+    let idGenero = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let generoAtualizado = await controllerGeneros.setAtualizarGenero(idGenero, dadosBody, contentType)
+
+    response.json(generoAtualizado)
+    response.status(generoAtualizado.status_code)
+
+})
+
+app.delete('/v2/AcmeFilmes/genero/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idGenero = request.params.id
+
+    let generoDeletado = await controllerGeneros.setExcluirGenero(idGenero)
+
+    response.json(generoDeletado)
+    response.status(generoDeletado.status_code)
+
+})
+
+///////////////////////CLASSIFICAÇÕES INDICATIVAS ///////////////////////////////////////////////
+
+app.get('/v2/AcmeFilmes/classificacoes', cors(), async (request, response) =>{
+
+    let listaDeClassificacoes = await controlerClassificacoes.getListarClassificacoes()
+
+    if(listaDeClassificacoes){
+        response.json(listaDeClassificacoes)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/classificacao/:id', cors(), async function (request, response){
+
+    let idClassificacao = request.params.id
+
+    let classificacao = await controlerClassificacoes.getBuscarClassificacao(idClassificacao)
+
+    if(classificacao){
+        response.json(classificacao)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.post('/v2/AcmeFilmes/classificacao', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovaClassificacaco = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType)
+    
+    response.status(resultDadosNovaClassificacaco.status_code)
+    response.json(resultDadosNovaClassificacaco)
+
+})
+
+app.delete('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let usuarioDeletado = await controllerUsuarios.setExcluirUsuario(idUsuario)
+
+    response.json(usuarioDeletado)
+    response.status(usuarioDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let usuarioAtualizado = await controllerUsuarios.setAtualizarUsuario(idUsuario, dadosBody, contentType)
+
+    response.json(usuarioAtualizado)
+    response.status(usuarioAtualizado.status_code)
+
+
+})
+
 
 
 //////////////////// USUÁRIOS ///////////////////

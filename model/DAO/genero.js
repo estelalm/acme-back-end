@@ -49,7 +49,7 @@ const insertGenero = async (dadosGenero) =>{
 
         let sql = `INSERT INTO tbl_genero 
                     (nome) values
-                    (${dadosGenero.nome})`
+                    ('${dadosGenero.nome}')`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -59,16 +59,51 @@ const insertGenero = async (dadosGenero) =>{
         return false
 
     }catch(error){
+        console.log(error)
         return false
     }
 }
 
-const updateGenero = async (id) =>{
+const updateGenero = async (id, dados) =>{
+
+    let idGenero = id
+    let dadosGenero = dados
+
+    try {
+
+        let sql = `update tbl_genero set 
+        nome = '${dadosGenero.nome}'
+        where id = ${idGenero}
+        `
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if(result)
+        return true
+        else
+        return false
+        
+    } catch (error) {
+        return false
+    }
     
 }
 
 const deleteGenero = async (id) =>{
     
+    try {
+        let sql = `delete from tbl_genero where id=${id}`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if(result)
+        return true
+        else
+        return false
+
+    } catch (error) {
+        return false
+    }
 }
 
 
@@ -101,5 +136,8 @@ const selectLastInsertId = async function () {
 module.exports = {
     selectAllGeneros,
     selectByIdGenero,
-    insertGenero
+    selectLastInsertId,
+    insertGenero,
+    deleteGenero,
+    updateGenero
 }
