@@ -26,18 +26,22 @@ const insertFilme = async function (dadosFilme) {
                 duracao,
                 data_lancamento,
                 data_relancamento,
-                foto_capa,
                 valor_unitario,
-                trailer
+                foto_capa,
+                trailer,
+                classificacao_id,
+                pais_origem_id
         )values (
                 '${dadosFilme.nome}',
                 '${dadosFilme.sinopse}',
                 '${dadosFilme.duracao}',
                 '${dadosFilme.data_lancamento}',
                 '${dadosFilme.data_relancamento}',
+                ${dadosFilme.valor_unitario},
                 '${dadosFilme.foto_capa}',
-                 ${dadosFilme.valor_unitario},
-                '${dadosFilme.trailer}'
+                '${dadosFilme.trailer}',
+                ${dadosFilme.classificacao},
+                ${dadosFilme.pais_origem}
     
         )`
         } else {
@@ -45,17 +49,21 @@ const insertFilme = async function (dadosFilme) {
                 sinopse, 
                 duracao,
                 data_lancamento,
-                data_relancamento,
+                valor_unitario,
                 foto_capa,
-                valor_unitario
+                trailer,
+                classificacao_id,
+                pais_origem_id
         )values (
                 '${dadosFilme.nome}',
                 '${dadosFilme.sinopse}',
                 '${dadosFilme.duracao}',
                 '${dadosFilme.data_lancamento}',
-                null,
+                ${dadosFilme.valor_unitario},
                 '${dadosFilme.foto_capa}',
-                 ${dadosFilme.valor_unitario}
+                '${dadosFilme.trailer}',
+                ${dadosFilme.classificacao},
+                ${dadosFilme.pais_origem}
     
         )`
         }
@@ -95,8 +103,10 @@ const updateFilme = async function (id, dados) {
             duracao = '${dadosFilme.duracao}',
             data_lancamento = '${dadosFilme.data_lancamento}',
             data_relancamento = ${dadosFilme.data_relancamento},
+            valor_unitario = ${dadosFilme.valor_unitario},
             foto_capa = '${dadosFilme.foto_capa}',
-            valor_unitario = ${dadosFilme.valor_unitario}
+            classificacao_id = ${dadosFilme.classificacao},
+            pais_origem_id = ${dadosFilme.pais_origem}
         
             where id = ${idFilme}`
     }else{
@@ -107,8 +117,10 @@ const updateFilme = async function (id, dados) {
         duracao = '${dadosFilme.duracao}',
         data_lancamento = '${dadosFilme.data_lancamento}',
         data_relancamento = null,
+        valor_unitario = ${dadosFilme.valor_unitario},
         foto_capa = '${dadosFilme.foto_capa}',
-        valor_unitario = ${dadosFilme.valor_unitario}
+        classificacao_id = ${dadosFilme.classificacao},
+        pais_origem_id = ${dadosFilme.pais_origem}
     
         where id = ${idFilme}`
     }
@@ -150,17 +162,18 @@ const deleteFilme = async function (id) {
 const selectAllFilmes = async function () {
 
     try {
-        let sql = `select max(tbl_filme.id) as id, tbl_filme.nome, max(sinopse) as sinopse, max(duracao) as duracao, max(data_lancamento) as data_lancamento, 
-        max(valor_unitario) as valor_unitario, max(foto_capa) as foto_capa, max(trailer) as trailer, 
-        max(tbl_classificacao.nome) as classificacao , max(tbl_paises.nome) as pais_origem,
+        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, data_relancamento, 
+        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_pais.nome as pais_origem,
          group_concat(distinct tbl_genero.nome separator "/") as generos,  
          group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
-         group_concat(distinct tbl_ator.nome separator ", ") as elenco from tbl_filme
+         group_concat(distinct tbl_ator.nome separator ", ") as elenco,
+         group_concat(distinct tbl_produtora.nome separator ", ") as produtora from tbl_filme
         inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
-        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.tbl_filme_id inner join tbl_diretor on tbl_diretor_filme.tbl_diretor_id=tbl_diretor.id
+        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.filme_id inner join tbl_diretor on tbl_diretor_filme.diretor_id=tbl_diretor.id
         inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
+        inner join tbl_produtora_filme on tbl_filme.id=tbl_produtora_filme.filme_id inner join tbl_produtora on tbl_produtora_filme.produtora_id=tbl_produtora.id
         join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
-        join tbl_paises on tbl_filme.pais_origem_id=tbl_paises.id group by tbl_filme.nome`
+        join tbl_pais on tbl_filme.pais_origem_id=tbl_pais.id group by tbl_filme.id`
 
         //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
         // $queryRawUnsafe(sql) -> possibilita enviar uma variável
@@ -178,16 +191,18 @@ const selectAllFilmes = async function () {
 const selectByIdFilme = async function (id) {
 
     try {
-        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, 
-        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_paises.nome as pais_origem,
+        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, data_relancamento, 
+        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_pais.nome as pais_origem,
          group_concat(distinct tbl_genero.nome separator "/") as generos,  
          group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
-         group_concat(distinct tbl_ator.nome separator ", ") as elenco from tbl_filme
+         group_concat(distinct tbl_ator.nome separator ", ") as elenco,
+         group_concat(distinct tbl_produtora.nome separator ", ") as produtora from tbl_filme
         inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
-        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.tbl_filme_id inner join tbl_diretor on tbl_diretor_filme.tbl_diretor_id=tbl_diretor.id
+        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.filme_id inner join tbl_diretor on tbl_diretor_filme.diretor_id=tbl_diretor.id
         inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
+        inner join tbl_produtora_filme on tbl_filme.id=tbl_produtora_filme.filme_id inner join tbl_produtora on tbl_produtora_filme.produtora_id=tbl_produtora.id
         join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
-        join tbl_paises on tbl_filme.pais_origem_id=tbl_paises.id where tbl_filme.id = ${id}`
+        join tbl_pais on tbl_filme.pais_origem_id=tbl_pais.id where tbl_filme.id = ${id}`
         
         //encaminha o script da variável sql para o banco de dados
         let rsFilmes = await prisma.$queryRawUnsafe(sql)

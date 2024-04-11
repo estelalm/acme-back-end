@@ -153,8 +153,6 @@ const setExcluirFilme = async function (id) {
 
     try {
 
-        let filmeDeletadoJSON = {}
-
         let idFilme = id
 
         if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {

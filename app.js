@@ -40,6 +40,7 @@ app.use((request,response,next) =>{
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
+const controllerUsuarios = require('./controller/controller_usuario.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
 //criando um objeto para controlar a chegada dos dados da reqisição em formato JSON
@@ -80,6 +81,9 @@ app.get('/v1/AcmeFilmes/filme/:id', cors(), async function( request, response, n
 
 //EndPoint: Versão 2.0 que retorna os dados de filmes do banco de dados
 //Período de utilização: 02/2024
+
+/////////// FILMES ///////////////////
+
 app.get('/v2/AcmeFilmes/filmes', cors(), async function (request, response) {
 
     //chama a função da controller para listar todos os filmes
@@ -174,9 +178,81 @@ app.put('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(reque
 
     response.json(filmeAtualizado)
     response.status(filmeAtualizado.status_code)
+
+
 })
 
+//////////////////// USUÁRIOS ///////////////////
+
+app.get('/v2/AcmeFilmes/usuarios', cors(), async (request, response) =>{
+
+    let listaDeUsuarios = await controllerUsuarios.getListarUsuarios()
+
+    if(listaDeUsuarios){
+        response.json(listaDeUsuarios)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/usuario/:id', cors(), async function (request, response) {
+
+    let idUsuario = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosUsuario = await controllerUsuarios.getBuscarUsuario(idUsuario)
+        response.status(dadosUsuario.status_code)
+        response.json(dadosUsuario)
+
+})
+
+app.post('/v2/AcmeFilmes/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoUsuario = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType)
+    
+    response.status(resultDadosNovoUsuario.status_code)
+    response.json(resultDadosNovoUsuario)
+
+})
+
+app.delete('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let usuarioDeletado = await controllerUsuarios.setExcluirUsuario(idUsuario)
+
+    response.json(usuarioDeletado)
+    response.status(usuarioDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let usuarioAtualizado = await controllerUsuarios.setAtualizarUsuario(idUsuario, dadosBody, contentType)
+
+    response.json(usuarioAtualizado)
+    response.status(usuarioAtualizado.status_code)
+
+
+})
+
+
+//app.listen na porta 8080
 app.listen('8080', () =>{
     console.log('API funcionando')
 })
-
