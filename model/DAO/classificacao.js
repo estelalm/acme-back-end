@@ -16,6 +16,7 @@ const selectAllClassificacoes = async () =>{
         else
         return false
     }catch(error){
+    console.log(error)
         return false
     }
 }
@@ -63,6 +64,7 @@ const insertClassificacao = async (dadosClassificacao) => {
         return false
 
     } catch (error) {
+
         return false
     }
 }
@@ -72,16 +74,16 @@ const updateClassificacao = async (id, dados) =>{
     let idClassificacao = id
     let dadosClassificacao = dados
 
-    try {
+    let sql = `update tbl_classificacao set 
+    nome = '${dadosClassificacao.nome}',
+    imagem = '${dadosClassificacao.imagem}',
+    nome_completo = '${dadosClassificacao.nome_completo}',
+    descricao = '${dadosClassificacao.descricao}',
+    sigla = '${dadosClassificacao.sigla}'
+    where id = ${idClassificacao};`
 
-        let sql = `update tbl_classificacao set 
-        nome = '${dadosClassificacao.nome}',
-        imagem = '${dadosClassificacao.imagem}',
-        nome_completo = '${dadosClassificacao.nome_completo}',
-        descricao = '${dadosClassificacao.descricao}',
-        sigla = '${dadosClassificacao.sigla}')
-        where id = ${idClassificacao}
-        `
+
+    try {
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -91,6 +93,7 @@ const updateClassificacao = async (id, dados) =>{
         return false
         
     } catch (error) {
+        console.log(error)
         return false
     }
     

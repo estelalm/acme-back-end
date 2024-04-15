@@ -79,7 +79,7 @@ const setInserirNovaClassificacao = async (dadosClassificacao, contentType) => {
 
             if (novaClassificacao) {
 
-                novaClassificacaoJSON.classificacao = novaClassificacao
+                novaClassificacaoJSON.classificacao = dadosClassificacao
                 novaClassificacaoJSON.classificacao.id = novaId
                 novaClassificacaoJSON.status = message.SUCCESS_CREATED_ITEM.status
                 novaClassificacaoJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -94,6 +94,7 @@ const setInserirNovaClassificacao = async (dadosClassificacao, contentType) => {
             return message.ERROR_CONTENT_TYPE
         }
     } catch (error) {
+        
         return message.ERROR_INTERNAL_SERVER
     }
 }
@@ -166,5 +167,7 @@ const setExcluirClassificacao = async (id) =>{
 module.exports = {
     getListarClassificacoes,
     getBuscarClassificacao,
-    setInserirNovaClassificacao
+    setInserirNovaClassificacao,
+    setAtualizarClassificacao,
+    setExcluirClassificacao
 }

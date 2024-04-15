@@ -41,8 +41,10 @@ app.use((request,response,next) =>{
 const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
 const controllerGeneros = require('./controller/controller_generos.js')
-const controlerClassificacoes = require('./controller/controller_classificacao.js')
+const controllerClassificacoes = require('./controller/controller_classificacao.js')
 const controllerUsuarios = require('./controller/controller_usuario.js')
+const controllerPaises = require('./controller/controller_paises.js')
+const contollerAdmnistradores = require('./controller/controller_admnistradores.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
 //criando um objeto para controlar a chegada dos dados da reqisição em formato JSON
@@ -258,7 +260,7 @@ app.delete('/v2/AcmeFilmes/genero/:id', cors(), bodyParserJSON, async function(r
 
 app.get('/v2/AcmeFilmes/classificacoes', cors(), async (request, response) =>{
 
-    let listaDeClassificacoes = await controlerClassificacoes.getListarClassificacoes()
+    let listaDeClassificacoes = await controllerClassificacoes.getListarClassificacoes()
 
     if(listaDeClassificacoes){
         response.json(listaDeClassificacoes)
@@ -274,7 +276,7 @@ app.get('/v2/AcmeFilmes/classificacao/:id', cors(), async function (request, res
 
     let idClassificacao = request.params.id
 
-    let classificacao = await controlerClassificacoes.getBuscarClassificacao(idClassificacao)
+    let classificacao = await controllerClassificacoes.getBuscarClassificacao(idClassificacao)
 
     if(classificacao){
         response.json(classificacao)
@@ -286,7 +288,7 @@ app.get('/v2/AcmeFilmes/classificacao/:id', cors(), async function (request, res
 
 })
 
-app.post('/v2/AcmeFilmes/classificacao', cors(), bodyParserJSON, async function(request, response){
+app.post('/v2/AcmeFilmes/classificacoes', cors(), bodyParserJSON, async function(request, response){
 
     //recebe o content type da requisição
     let contentType = request.header('content-type')
@@ -295,39 +297,111 @@ app.post('/v2/AcmeFilmes/classificacao', cors(), bodyParserJSON, async function(
     let dadosBody = request.body
 
     //encaminha os dados para a controller enviar para o DAO
-    let resultDadosNovaClassificacaco = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType)
+    let resultDadosNovaClassificacaco = await controllerClassificacoes.setInserirNovaClassificacao(dadosBody, contentType)
     
     response.status(resultDadosNovaClassificacaco.status_code)
     response.json(resultDadosNovaClassificacaco)
 
 })
 
-app.delete('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+app.delete('/v2/AcmeFilmes/classificacao/:id', cors(), bodyParserJSON, async function(request, response){
 
-    let idUsuario = request.params.id
+    let idClassificacao = request.params.id
 
-    let usuarioDeletado = await controllerUsuarios.setExcluirUsuario(idUsuario)
+    let classificacaoDeletada = await controllerClassificacoes.setExcluirClassificacao(idClassificacao)
 
-    response.json(usuarioDeletado)
-    response.status(usuarioDeletado.status_code)
+    response.json(classificacaoDeletada)
+    response.status(classificacaoDeletada.status_code)
 })
 
-app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+app.put('/v2/AcmeFilmes/classificacao/:id', cors(), bodyParserJSON, async function(request, response){
 
-    let idUsuario = request.params.id
+    let idClassificacao = request.params.id
 
     let contentType = request.header('content-type')
 
     let dadosBody = request.body
 
-    let usuarioAtualizado = await controllerUsuarios.setAtualizarUsuario(idUsuario, dadosBody, contentType)
+    let classificacaoAtualizada = await controllerClassificacoes.setAtualizarClassificacao(idClassificacao, dadosBody, contentType)
 
-    response.json(usuarioAtualizado)
-    response.status(usuarioAtualizado.status_code)
+    response.json(classificacaoAtualizada)
+    response.status(classificacaoAtualizada.status_code)
 
 
 })
 
+/////////////////////// PAÍSES /////////////////////////////
+app.get('/v2/AcmeFilmes/paises', cors(), async (request, response) =>{
+
+    let listaDePaises = await controllerPaises.getListarPaises()
+
+    if(listaDePaises){
+        response.json(listaDePaises)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/pais/:id', cors(), async function (request, response){
+
+    let idPais = request.params.id
+
+    let pais = await controllerPaises.getBuscarPais(idPais)
+
+    if(pais){
+        response.json(pais)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.post('/v2/AcmeFilmes/paises', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoPais = await controllerPaises.setInserirNovoPais(dadosBody, contentType)
+    
+    response.status(resultDadosNovoPais.status_code)
+    response.json(resultDadosNovoPais)
+
+})
+
+app.delete('/v2/AcmeFilmes/pais/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idPais = request.params.id
+
+    let paisDeletado = await controllerPaises.setExcluirPais(idPais)
+
+    response.json(paisDeletado)
+    response.status(paisDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/pais/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idPais = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let paisAtualizado = await controllerPaises.setAtualizarPais(idPais, dadosBody, contentType)
+
+    response.json(paisAtualizado)
+    response.status(paisAtualizado.status_code)
+
+
+})
 
 
 //////////////////// USUÁRIOS ///////////////////
@@ -399,6 +473,74 @@ app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(req
 
 })
 
+//////////////////// ADMNISTRADORES /////////////////////
+
+app.get('/v2/AcmeFilmes/admnistradores', cors(), async (request, response) =>{
+
+    let listaDeAdmnistradores = await contollerAdmnistradores.getListarAdmnistradores()
+
+    if(listaDeAdmnistradores){
+        response.json(listaDeAdmnistradores)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/admnistrador/:id', cors(), async function (request, response) {
+
+    let idAdmnistrador = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosAdmnistrador = await contollerAdmnistradores.getBuscarAdmnistrador(idAdmnistrador)
+        response.status(dadosAdmnistrador.status_code)
+        response.json(dadosAdmnistrador)
+
+})
+
+app.post('/v2/AcmeFilmes/admnistradores', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoUsuario = await contollerAdmnistradores.setInserirNovoAdmnistrador(dadosBody, contentType)
+    
+    response.status(resultDadosNovoUsuario.status_code)
+    response.json(resultDadosNovoUsuario)
+
+})
+
+app.delete('/v2/AcmeFilmes/admnistrador/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idAdmnistrador = request.params.id
+
+    let admnistradorDeletado = await contollerAdmnistradores.setExcluirAdmnistrador(idAdmnistrador)
+
+    response.json(admnistradorDeletado)
+    response.status(admnistradorDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/admnistrador/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idAdmnistrador = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let admnistradorAtualizado = await contollerAdmnistradores.setAtualizarAdmnistrador(idAdmnistrador, dadosBody, contentType)
+
+    response.json(admnistradorAtualizado)
+    response.status(admnistradorAtualizado.status_code)
+
+
+})
 
 //app.listen na porta 8080
 app.listen('8080', () =>{
