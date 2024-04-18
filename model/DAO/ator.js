@@ -35,17 +35,36 @@ const insertAtor = async function (dadosAtor){
 
     try {
         
-        let sql = `INSERT INTO tbl_ator 
-        (nome, 
-        cpf, 
-        telefone, 
-        email, 
-        senha) values
-        ('${dadosAtor.nome}', 
-        '${dadosAtor.cpf}', 
-        '${dadosAtor.telefone}', 
-        '${dadosAtor.email}', 
-        '${dadosAtor.senha}')`
+        let falecimento
+        if (dadosAtor.data_falecimento != null && dadosAtor.data_falecimento != "" && dadosAtor.data_falecimento != undefined){
+            falecimento = `'${dadosAtor.data_falecimento}'`
+        }else{
+            falecimento = null
+        }
+
+        let fotoAtor
+        if (dadosAtor.foto != null && dadosAtor.foto != "" && dadosAtor.foto != undefined){
+            fotoAtor = `'${dadosAtor.foto}'`
+        }else{
+            fotoAtor = null
+        }
+
+        let sql
+            sql = `INSERT INTO tbl_ator 
+            (nome, 
+            nome_artistico, 
+            data_nascimento, 
+            data_falecimento, 
+            biografia
+            foto) values
+            ('${dadosAtor.nome}', 
+            '${dadosAtor.nome_artistico}', 
+            '${dadosAtor.data_nascimento}', 
+             ${falecimento}, 
+            '${dadosAtor.biografia}',
+             ${fotoAtor}
+        
+        )`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -59,20 +78,43 @@ const insertAtor = async function (dadosAtor){
     }
 }
 
+const insertNacionalidadeAtor = (idAtor, idNacionalidade) =>{
+
+}
+
 const updateAtor = async function (id, dados){
+
     let dadosAtor = dados
 
     try{
 
-        let sql = `update tbl_ator set 
+        let falecimento
+        if (dadosAtor.data_falecimento != null && dadosAtor.data_falecimento != "" && dadosAtor.data_falecimento != undefined){
+            falecimento = `'${dadosAtor.data_falecimento}'`
+        }else{
+            falecimento = null
+        }
+
+        let fotoAtor
+        if (dadosAtor.foto != null && dadosAtor.foto != "" && dadosAtor.foto != undefined){
+            fotoAtor = `'${dadosAtor.foto}'`
+        }else{
+            fotoAtor = null
+        }
+
+        let sql
+            sql = `update tbl_ator set 
         
-        nome = '${dadosAtor.nome}',
-        cpf = '${dadosAtor.cpf}', 
-        telefone = '${dadosAtor.telefone}',
-        email = '${dadosAtor.email}',
-        senha = '${dadosAtor.senha}'
-    
-        where id = ${id}`
+            nome = '${dadosAtor.nome}',
+            nome_artistico = '${dadosAtor.nome_artistico}', 
+            data_nascimento = '${dadosAtor.data_nascimento}',
+            data_falecimento = ${falecimento},
+            biografia = '${dadosAtor.biografia}',
+            foto = ${fotoAtor}
+        
+            where id = ${id}`
+
+        
 
         let result = await prisma.$executeRawUnsafe(sql)
 

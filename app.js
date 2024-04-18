@@ -42,8 +42,10 @@ const filmes_funcoes = require('./controller/filmes_funcoes.js')
 const controllerFilmes = require('./controller/controller_filme.js')
 const controllerGeneros = require('./controller/controller_generos.js')
 const controllerClassificacoes = require('./controller/controller_classificacao.js')
-const controllerUsuarios = require('./controller/controller_usuario.js')
 const controllerPaises = require('./controller/controller_paises.js')
+const controllerProdutoras = require('./controller/controller_produtoras.js')
+const controllerAtores = require('./controller/controller_atores.js')
+const controllerUsuarios = require('./controller/controller_usuario.js')
 const contollerAdmnistradores = require('./controller/controller_admnistradores.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
@@ -399,6 +401,145 @@ app.put('/v2/AcmeFilmes/pais/:id', cors(), bodyParserJSON, async function(reques
 
     response.json(paisAtualizado)
     response.status(paisAtualizado.status_code)
+
+
+})
+
+///////////////////// PRODUTORAS /////////////////
+
+app.get('/v2/AcmeFilmes/produtoras', cors(), async function (request, response){
+
+    let listaDeProdutoras = await controllerProdutoras.getListarProdutoras()
+
+    if(listaDeProdutoras){
+        response.json(listaDeProdutoras)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/produtora/:id', cors(), async function (request, response){
+
+    let idProdutora = request.params.id
+
+    let produtora = await controllerProdutoras.getBuscarProdutora(idProdutora)
+
+    if(produtora){
+        response.json(produtora)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.post('/v2/AcmeFilmes/produtoras', cors(), bodyParserJSON, async function(request, response){
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let resultNovaProdutora = await controllerProdutoras.setInserirNovaProdutora(dadosBody, contentType)
+
+    // response.status(resultNovoGenero.status_code)
+    response.json(resultNovaProdutora)
+})
+
+app.put('/v2/AcmeFilmes/produtora/:id', cors(), bodyParserJSON, async  function(request, response){
+
+    let idProdutora = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let produtoraAtualizada = await controllerProdutoras.setAtualizarProdutora(idProdutora, dadosBody, contentType)
+
+    response.json(produtoraAtualizada)
+    response.status(produtoraAtualizada.status_code)
+
+})
+
+app.delete('/v2/AcmeFilmes/produtora/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idProdutora = request.params.id
+
+    let produtoraDeletada = await controllerProdutoras.setExcluirProdutora(idProdutora)
+
+    response.json(produtoraDeletada)
+    response.status(produtoraDeletada.status_code)
+
+})
+
+///////////////////////////////////// ATORES //////////////////////////////
+
+app.get('/v2/AcmeFilmes/atores', cors(), async (request, response) =>{
+
+    let listaDeAtores = await controllerAtores.getListarAtores()
+
+    if(listaDeAtores){
+        response.json(listaDeAtores)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/ator/:id', cors(), async function (request, response) {
+
+    let idAtor = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosAtor = await controllerAtores.getBuscarAtor(idAtor)
+        response.status(dadosAtor.status_code)
+        response.json(dadosAtor)
+
+})
+
+app.post('/v2/AcmeFilmes/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoUsuario = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType)
+    
+    response.status(resultDadosNovoUsuario.status_code)
+    response.json(resultDadosNovoUsuario)
+
+})
+
+app.delete('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let usuarioDeletado = await controllerUsuarios.setExcluirUsuario(idUsuario)
+
+    response.json(usuarioDeletado)
+    response.status(usuarioDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let usuarioAtualizado = await controllerUsuarios.setAtualizarUsuario(idUsuario, dadosBody, contentType)
+
+    response.json(usuarioAtualizado)
+    response.status(usuarioAtualizado.status_code)
 
 
 })
