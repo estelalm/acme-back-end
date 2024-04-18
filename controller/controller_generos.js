@@ -67,6 +67,42 @@ const getBuscarGenero = async (id) => {
 
 }
 
+const getGeneroPorFilme = async (id)=>{
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let generoArray = []
+
+            let dadosGeneros = await generosDAO.selectByFilmeGenero(idFilme)
+
+            dadosGeneros.forEach(genero =>{
+                generoArray.push(genero)
+            })
+
+            if (dadosGeneros) {
+
+                if (dadosGeneros.length > 0) {
+                    return generoArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+        return [message.ERROR_INTERNAL_SERVER]
+    }
+}
+
 const setInserirNovoGenero = async (dadosGenero, contentType) => {
 
     try {
@@ -178,6 +214,7 @@ const setExcluirGenero = async (id) => {
 module.exports = {
     getListarGeneros,
     getBuscarGenero,
+    getGeneroPorFilme,
     setInserirNovoGenero,
     setExcluirGenero,
     setAtualizarGenero

@@ -162,19 +162,7 @@ const deleteFilme = async function (id) {
 const selectAllFilmes = async function () {
 
     try {
-        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, 
-        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_pais.nome as pais_origem,
-         group_concat(distinct tbl_genero.nome separator "/") as generos,  
-         group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
-         group_concat(distinct tbl_ator.nome separator ", ") as elenco,
-         group_concat(distinct tbl_produtora.nome separator ", ") as produtora
-         from tbl_filme
-        inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
-        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.filme_id inner join tbl_diretor on tbl_diretor_filme.diretor_id=tbl_diretor.id
-        inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
-        inner join tbl_produtora_filme on tbl_filme.id=tbl_produtora_filme.filme_id inner join tbl_produtora on tbl_produtora_filme.produtora_id=tbl_produtora.id
-        join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
-        join tbl_pais on tbl_filme.pais_origem_id=tbl_pais.id group by tbl_filme.id;`
+        let sql = ` select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme;`
 
         //Prisma executa o script (encaminhado pela variável) dentro do banco de dados pra retornar -> rs: result/record set
         // $queryRawUnsafe(sql) -> possibilita enviar uma variável
@@ -192,19 +180,8 @@ const selectAllFilmes = async function () {
 const selectByIdFilme = async function (id) {
 
     try {
-        let sql = `select tbl_filme.id, tbl_filme.nome, sinopse, duracao, data_lancamento, 
-        valor_unitario, foto_capa, trailer , tbl_classificacao.nome as classificacao , tbl_pais.nome as pais_origem,
-         group_concat(distinct tbl_genero.nome separator "/") as generos,  
-         group_concat(distinct tbl_diretor.nome separator ", ") as diretor,
-         group_concat(distinct tbl_ator.nome separator ", ") as elenco,
-         group_concat(distinct tbl_produtora.nome separator ", ") as produtora
-         from tbl_filme
-        inner join tbl_genero_filme on tbl_filme.id = tbl_genero_filme.filme_id inner join tbl_genero on tbl_genero_filme.genero_id = tbl_genero.id
-        inner join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.filme_id inner join tbl_diretor on tbl_diretor_filme.diretor_id=tbl_diretor.id
-        inner join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.filme_id inner join tbl_ator on tbl_ator_filme.ator_id=tbl_ator.id
-        inner join tbl_produtora_filme on tbl_filme.id=tbl_produtora_filme.filme_id inner join tbl_produtora on tbl_produtora_filme.produtora_id=tbl_produtora.id
-        join tbl_classificacao on tbl_filme.classificacao_id=tbl_classificacao.id
-        join tbl_pais on tbl_filme.pais_origem_id=tbl_pais.id where tbl_filme.id = ${id}`
+        let sql = ` select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+                    where tbl_filme.id = ${id}`
         
         //encaminha o script da variável sql para o banco de dados
         let rsFilmes = await prisma.$queryRawUnsafe(sql)
@@ -221,7 +198,8 @@ const selectByNomeFilme = async function (nomeFilme) {
 
     let nome = nomeFilme.replaceAll('"', '')
     try {
-        let sql = `select * from tbl_filme where nome like '%${nome}%'`
+        let sql = ` select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+                    where nome like '%${nome}%'`
         let rsFilme = await prisma.$queryRawUnsafe(sql)
         return rsFilme
     } catch (error) {

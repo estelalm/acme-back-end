@@ -8,6 +8,9 @@
 //import do arquivo de configuração do projeto
 const message = require('../modulo/config.js')
 const filmesDAO = require('../model/DAO/filme.js')
+const controllerClassificacoes = require('../controller/controller_classificacao.js')
+const controllerPaises = require('../controller/controller_paises.js')
+const controllerGeneros = require('../controller/controller_generos.js')
 
 //função para inserir um novo filme
 const setInserirNovoFilme = async function (dadosFilme, contentType) {
@@ -187,6 +190,23 @@ const getListarFilmes = async function () {
 
         //chama a função do DAO que retorna os filmes do banco
         let dadosFilmes = await filmesDAO.selectAllFilmes()
+
+        //chama as funções que retornam outras informações do filme
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+            filme.classificacao = classificacaoFilme;
+        }));
+
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+            filme.pais_origem = paisFilme;
+        }));
+
+        await Promise.all(dadosFilmes.map(async (ator) => {
+            let generoFilme = await controllerGeneros.getGeneroPorFilme(ator.id);
+            ator.generos = generoFilme;
+        }));
+
         //validação para verificar se o DAO retornou dados
         if (dadosFilmes) {
             //cria os atributos para reornar ao app
@@ -202,11 +222,10 @@ const getListarFilmes = async function () {
             }
 
         } else {
-            
             return message.ERROR_INTERNAL_SERVER_DB
         }
     } catch (error) {
-        
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER //500: erro na controller
     }
 }

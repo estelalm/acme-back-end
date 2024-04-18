@@ -45,6 +45,7 @@ const controllerClassificacoes = require('./controller/controller_classificacao.
 const controllerPaises = require('./controller/controller_paises.js')
 const controllerProdutoras = require('./controller/controller_produtoras.js')
 const controllerAtores = require('./controller/controller_atores.js')
+const controllerDiretores = require('./controller/controller_diretores.js')
 const controllerUsuarios = require('./controller/controller_usuario.js')
 const contollerAdmnistradores = require('./controller/controller_admnistradores.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
@@ -530,19 +531,88 @@ app.delete('/v2/AcmeFilmes/ator/:id', cors(), bodyParserJSON, async function(req
 
 app.put('/v2/AcmeFilmes/ator/:id', cors(), bodyParserJSON, async function(request, response){
 
-    let idUsuario = request.params.id
+    let idAtor = request.params.id
 
     let contentType = request.header('content-type')
 
     let dadosBody = request.body
 
-    let usuarioAtualizado = await controllerUsuarios.setAtualizarUsuario(idUsuario, dadosBody, contentType)
+    let atorAtualizado = await controllerAtores.setAtualizarAtor(idAtor, dadosBody, contentType)
 
-    response.json(usuarioAtualizado)
-    response.status(usuarioAtualizado.status_code)
+    response.json(atorAtualizado)
+    response.status(atorAtualizado.status_code)
 
 
 })
+
+///////////////////////////////////////// DIRETORES /////////////////////////////
+app.get('/v2/AcmeFilmes/diretores', cors(), async (request, response) =>{
+
+    let listaDeDiretores = await controllerDiretores.getListarDiretores()
+
+    if(listaDeDiretores){
+        response.json(listaDeDiretores)
+        response.status(200)
+    }else{
+        response.json({erro:'itens não encontrados'})
+        response.status(404)
+    }
+
+})
+
+app.get('/v2/AcmeFilmes/diretor/:id', cors(), async function (request, response) {
+
+    let idDiretor = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosDiretor = await controllerDiretores.getBuscarDiretor(idDiretor)
+        response.status(dadosDiretor.status_code)
+        response.json(dadosDiretor)
+
+})
+
+app.post('/v2/AcmeFilmes/diretor', cors(), bodyParserJSON, async function(request, response){
+
+    //recebe o content type da requisição
+    let contentType = request.header('content-type')
+
+    //recebe todos os dados enviados na requisição pelo body
+    let dadosBody = request.body
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoDiretor = await controllerDiretores.setInserirNovoDiretor(dadosBody, contentType)
+    
+    response.status(resultDadosNovoDiretor.status_code)
+    response.json(resultDadosNovoDiretor)
+
+})
+
+app.delete('/v2/AcmeFilmes/diretor/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idDiretor = request.params.id
+
+    let diretorDeletado = await controllerDiretores.setExcluirDiretor(idDiretor)
+
+    response.json(diretorDeletado)
+    response.status(diretorDeletado.status_code)
+})
+
+app.put('/v2/AcmeFilmes/diretor/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idDiretor = request.params.id
+
+    let contentType = request.header('content-type')
+
+    let dadosBody = request.body
+
+    let diretorAtualizado = await controllerDiretores.setAtualizarDiretor(idDiretor, dadosBody, contentType)
+
+    response.json(diretorAtualizado)
+    response.status(diretorAtualizado.status_code)
+
+
+})
+
 
 
 //////////////////// USUÁRIOS ///////////////////

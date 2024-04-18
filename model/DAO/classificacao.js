@@ -44,6 +44,27 @@ const selectByIdClassificacao = async (id) =>{
 
 }
 
+const selectByFilmeClassificacao = async (id) =>{
+
+    try{
+
+        let sql = ` select tbl_classificacao.id, tbl_classificacao.nome, nome_completo, descricao, sigla from tbl_classificacao 
+        join tbl_filme on tbl_classificacao.id = tbl_filme.classificacao_id 
+        where tbl_filme.id = ${id}`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result)
+        return result
+        else
+        return false
+
+    }catch(error){
+        return false
+    }
+
+}
+
 const insertClassificacao = async (dadosClassificacao) => {
     try {
         let sql = `INSERT INTO tbl_classificacao
@@ -145,6 +166,7 @@ const selectLastInsertId = async function () {
 module.exports = {
     selectAllClassificacoes,
     selectByIdClassificacao,
+    selectByFilmeClassificacao,
     insertClassificacao,
     updateClassificacao,
     deleteClassificacao,

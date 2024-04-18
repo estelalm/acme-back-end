@@ -24,6 +24,29 @@ const selectAllGeneros = async () =>{
 
 }
 
+const selectByFilmeGenero = async (id) =>{
+
+    let idFilme = id
+    try{
+
+        let sql = `select tbl_genero.id, tbl_genero.nome from tbl_genero 
+        inner join tbl_genero_filme on tbl_genero.id=tbl_genero_filme.genero_id 
+        inner join tbl_filme on tbl_genero_filme.filme_id=tbl_filme.id
+        where tbl_filme.id = ${idFilme};`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result)
+        return result
+        else
+        return false
+
+    }catch(error){
+        return false
+    }
+
+}
+
 const selectByIdGenero = async (id) =>{
 
     try{
@@ -31,7 +54,7 @@ const selectByIdGenero = async (id) =>{
         let sql = `select * from tbl_genero where id = ${id}`
 
         let result = await prisma.$queryRawUnsafe(sql)
-
+        
         if(result)
         return result
         else
@@ -136,6 +159,7 @@ const selectLastInsertId = async function () {
 module.exports = {
     selectAllGeneros,
     selectByIdGenero,
+    selectByFilmeGenero,
     selectLastInsertId,
     insertGenero,
     deleteGenero,

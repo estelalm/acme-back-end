@@ -99,6 +99,77 @@ const getPaisesPorAtor = async (id)=>{
         }
 
     } catch (error) {
+
+        return [message.ERROR_INTERNAL_SERVER]
+    }
+}
+
+const getPaisesPorDiretor = async (id)=>{
+    let idDiretor = id
+
+    try {
+        if (idDiretor == "" || idDiretor == undefined || isNaN(idDiretor)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let paisArray = []
+
+            let dadosPaises = await paisesDAO.selectByDiretorPais(idDiretor)
+
+            dadosPaises.forEach(pais =>{
+                paisArray.push(pais)
+            })
+
+            if (dadosPaises) {
+
+                if (dadosPaises.length > 0) {
+                    return paisArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+
+        return [message.ERROR_INTERNAL_SERVER]
+    }
+}
+const getPaisPorFilme = async (id)=>{
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let paisArray = []
+
+            let dadosPaises = await paisesDAO.selectByFilmePais(idFilme)
+
+
+            dadosPaises.forEach(pais =>{
+                paisArray.push(pais)
+            })
+
+            if (dadosPaises) {
+
+                if (dadosPaises.length > 0) {
+                    return paisArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+
         return [message.ERROR_INTERNAL_SERVER]
     }
 }
@@ -254,6 +325,8 @@ module.exports = {
     getListarPaises,
     getBuscarPais,
     getPaisesPorAtor,
+    getPaisesPorDiretor,
+    getPaisPorFilme,
     setInserirNovoPais,
     setExcluirPais,
     setAtualizarPais

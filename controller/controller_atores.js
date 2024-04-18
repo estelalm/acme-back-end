@@ -1,45 +1,74 @@
 const message = require('../modulo/config.js')
 const atoresDAO = require('../model/DAO/ator.js')
-const controllerPaises = require('../controller/controller_paises.js')
+const controllerAtores = require('../controller/controller_atores.js')
 
-const getListarAtores = async function () {
+// const getListarAtores = async function () {
 
-    try {
-        let atoresJSON = {}
+//     try {
+//         let atoresJSON = {}
 
-        let dadosAtores = await atoresDAO.selectAllAtores()
-        let atoresArray = []
+//         let dadosAtores = await atoresDAO.selectAllAtores()
+//         let atoresArray = []
 
-        async function teste (atorJSON) {
-            async function teste2 (id){
-                let nacionalidadeAtor = await controllerPaises.getPaisesPorAtor(id)
-                return nacionalidadeAtor
-            }
-            atorJSON.nacionalidade = await teste2(atorJSON.id)
-        }
+//         async function teste (atorJSON) {
+//             async function teste2 (id){
+//                 let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(id)
+//                 return nacionalidadeAtor
+//             }
+//             atorJSON.nacionalidade = await teste2(atorJSON.id)
+//         }
 
-        dadosAtores.forEach(async ator => await teste(ator))
+//         dadosAtores.forEach(async ator => await teste(ator))
         
+
+//         if (dadosAtores) {
+//             if (dadosAtores.length > 0) {
+//                 atoresJSON.atores = dadosAtores
+//                 atoresJSON.quantidade = dadosAtores.length
+//                 atoresJSON.status_code = 200
+
+//                 return atoresJSON
+//             } else {
+//                 return message.ERROR_NOT_FOUND
+//             }
+
+//         } else {
+//             return message.ERROR_INTERNAL_SERVER_DB
+//         }
+    
+//     } catch (error) {
+//         return message.ERROR_INTERNAL_SERVER 
+//     }
+// }
+const getListarAtores = async function () {
+    try {
+        let atoresJSON = {};
+        let dadosAtores = await atoresDAO.selectAllAtores();
+
+        //faz tudo ser executado antes de passar para a próxima ação -> map devolve um array atualizado como resultado
+        //da função, sem precisar do .push
+        await Promise.all(dadosAtores.map(async (ator) => {
+            let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(ator.id);
+            ator.nacionalidade = nacionalidadeAtor;
+        }));
+
 
         if (dadosAtores) {
             if (dadosAtores.length > 0) {
-                atoresJSON.atores = dadosAtores
-                atoresJSON.quantidade = dadosAtores.length
-                atoresJSON.status_code = 200
-
-                return atoresJSON
+                atoresJSON.atores = dadosAtores;
+                atoresJSON.quantidade = dadosAtores.length;
+                atoresJSON.status_code = 200;
+                return atoresJSON;
             } else {
-                return message.ERROR_NOT_FOUND
+                return message.ERROR_NOT_FOUND;
             }
-
         } else {
-            return message.ERROR_INTERNAL_SERVER_DB
+            return message.ERROR_INTERNAL_SERVER_DB;
         }
-    
     } catch (error) {
-        return message.ERROR_INTERNAL_SERVER 
+        return message.ERROR_INTERNAL_SERVER;
     }
-}
+};
 
 
 const getBuscarAtor = async (id) =>{
@@ -54,12 +83,14 @@ const getBuscarAtor = async (id) =>{
             let atorJSON = {}
 
             let dadosAtor = await atoresDAO.selectByIdAtor(idAtor)
+            console.log(dadosAtor)
 
+        
             if (dadosAtor) {
 
                 if (dadosAtor.length > 0) {
-
                     atorJSON.ator = dadosAtor
+                    dadosAtor[0].nacionalidade = await controllerAtores.getAtoresPorAtor(id);
                     atorJSON.status_code = 200
 
                     return atorJSON
@@ -73,9 +104,51 @@ const getBuscarAtor = async (id) =>{
             }
         }
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 
+}
+
+const getAtorPorFilme = async (id)=>{
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let atorArray = []
+
+            let dadosAtores = await atoresDAO.selectByFilmeAtor(idFilme)
+
+            await Promise.all(dadosAtores.map(async (ator) => {
+                let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(ator.id);
+                ator.nacionalidade = nacionalidadeAtor;
+            }));
+
+            dadosAtores.forEach(ator =>{
+                atorArray.push(ator)
+            })
+
+            if (dadosAtores) {
+
+                if (dadosAtores.length > 0) {
+                    return atorArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+        return [message.ERROR_INTERNAL_SERVER]
+    }
 }
 
 const setInserirNovoAtor = async function (dadosAtor, contentType) {
@@ -168,10 +241,11 @@ const setExcluirAtor = async function (id) {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
             return message.ERROR_INVALID_ID
         } else {
+
             let nacionalidadeAtorDeletada = await atoresDAO.deleteNacionalidadeAtor(idAtor)
-            // let atorDeletado = await atoresDAO.deleteAtor(idAtor)
+            let atorDeletado = await atoresDAO.deleteAtor(idAtor)
             
-            if (nacionalidadeAtorDeletada) {
+            if (atorDeletado && nacionalidadeAtorDeletada) {
                 return message.SUCCESS_DELETED_ITEM 
 
             } else {
@@ -179,6 +253,7 @@ const setExcluirAtor = async function (id) {
             }
         }
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER 
     }
 
@@ -200,25 +275,35 @@ const setAtualizarAtor = async function (id, dados, contentType){
                 if (dadosAtor.nome == "" || dadosAtor.nome == undefined || dadosAtor.nome == null || dadosAtor.nome.length > 80 ||
                 dadosAtor.nome_artistico == "" || dadosAtor.nome_artistico == undefined || dadosAtor.nome_artistico == null || dadosAtor.nome_artistico.length > 18 ||
                 dadosAtor.data_nascimento == "" || dadosAtor.data_nascimento == undefined || dadosAtor.data_nascimento == null || dadosAtor.data_nascimento.length > 15 ||
-                dadosAtor.data_falecimento == "" || dadosAtor.data_falecimento == undefined || dadosAtor.data_falecimento == null || dadosAtor.data_falecimento.length > 50 ||
-                dadosAtor.biografia == "" || dadosAtor.biografia == undefined || dadosAtor.biografia == null || dadosAtor.biografia.length > 20
+                dadosAtor.biografia == "" || dadosAtor.biografia == undefined || dadosAtor.biografia == null 
                 ) {
                     return message.ERROR_REQUIRED_FIELDS
                 } else {
 
-
+                        let nacionalidadesAntigas = await controllerAtores.getAtoresPorAtor(idAtor)
                         let atorAtualizado = await atoresDAO.updateAtor(idAtor, dadosAtor)
+
+                        let count = 0
+                        let nacionalidadeAtorAtualizada
+                        nacionalidadesAntigas.forEach(async nacionalidadeAntiga =>{
+                            nacionalidadeAtorAtualizada = await atoresDAO.updateNacionalidadeAtor(idAtor, dadosAtor.nacionalidade[count], nacionalidadeAntiga.id)
+                            count ++
+                        })
+
+                        let dadosAtorAtualiazado = await getBuscarAtor(idAtor)
 
                         let atorAtualizadoJSON = {}
 
+                        console.log(nacionalidadeAtorAtualizada)
                         if (atorAtualizado){
-                            atorAtualizadoJSON.ator = dadosAtor
+                            atorAtualizadoJSON.ator = dadosAtorAtualiazado.ator
                             atorAtualizadoJSON.status = message.SUCCESS_UPDATED_ITEM.status
                             atorAtualizadoJSON.status_code = message.SUCCESS_UPDATED_ITEM.status_code
                             atorAtualizadoJSON.message = message.SUCCESS_UPDATED_ITEM.message
 
                             return atorAtualizadoJSON
                         }else{
+
                             return message.ERROR_INTERNAL_SERVER_DB
                         }
 

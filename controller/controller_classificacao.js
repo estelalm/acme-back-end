@@ -64,6 +64,41 @@ const getBuscarClassificacao = async (id) => {
     }
 }
 
+const getBuscarClassficacaoFilme = async (id) => {
+
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return message.ERROR_INVALID_ID
+        } else {
+
+            let classificacaoJSON = {}
+            let dadosFilme = await classificacaoDAO.selectByFilmeClassificacao(idFilme)
+
+            if (dadosFilme) {
+
+                if (dadosFilme.length > 0) {
+                    classificacaoJSON.classificacao = dadosFilme
+                    classificacaoJSON.quantidade = dadosFilme.length
+                    classificacaoJSON.status_code = 200
+
+                    return classificacaoJSON
+
+                } else {
+                    return message.ERROR_NOT_FOUND
+                }
+            } else {
+                return message.ERROR_INTERNAL_SERVER_DB
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+}
+
 const setInserirNovaClassificacao = async (dadosClassificacao, contentType) => {
 
     try {
@@ -169,5 +204,6 @@ module.exports = {
     getBuscarClassificacao,
     setInserirNovaClassificacao,
     setAtualizarClassificacao,
+    getBuscarClassficacaoFilme,
     setExcluirClassificacao
 }
