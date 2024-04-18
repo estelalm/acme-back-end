@@ -55,7 +55,7 @@ const insertAtor = async function (dadosAtor){
             nome_artistico, 
             data_nascimento, 
             data_falecimento, 
-            biografia
+            biografia,
             foto) values
             ('${dadosAtor.nome}', 
             '${dadosAtor.nome_artistico}', 
@@ -63,8 +63,27 @@ const insertAtor = async function (dadosAtor){
              ${falecimento}, 
             '${dadosAtor.biografia}',
              ${fotoAtor}
-        
         )`
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if(result)
+            return result
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const insertNacionalidadeAtor = async function(idAtor, idNacionalidade){
+
+    try {
+
+        let sql = `INSERT INTO tbl_nacionalidade_ator 
+            (ator_id, pais_id) values
+            ('${idAtor}', ${idNacionalidade})`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -76,9 +95,6 @@ const insertAtor = async function (dadosAtor){
     } catch (error) {
         return false
     }
-}
-
-const insertNacionalidadeAtor = (idAtor, idNacionalidade) =>{
 
 }
 
@@ -145,9 +161,32 @@ const deleteAtor = async function (id){
             return false
 
     } catch (error) {
+        console.log("a")
         return false
     }
 
+}
+
+const updateNacionalidadeAtor = async function (){
+
+}
+
+const deleteNacionalidadeAtor = async function (id) {
+    let idAtor = id
+
+    try {
+        let sql = `delete from tbl_nacionalidade_ator where ator_id = ${idAtor}`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+        console.log(result)
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        return false
+    }
 }
 
 const selectLastInsertId = async function () {
@@ -181,5 +220,8 @@ module.exports = {
     selectLastInsertId,
     deleteAtor,
     insertAtor,
-    updateAtor
+    updateAtor,
+    insertNacionalidadeAtor,
+    deleteNacionalidadeAtor,
+    updateNacionalidadeAtor
 }

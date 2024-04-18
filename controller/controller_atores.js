@@ -1,5 +1,6 @@
 const message = require('../modulo/config.js')
 const atoresDAO = require('../model/DAO/ator.js')
+const controllerPaises = require('../controller/controller_paises.js')
 
 const getListarAtores = async function () {
 
@@ -7,6 +8,18 @@ const getListarAtores = async function () {
         let atoresJSON = {}
 
         let dadosAtores = await atoresDAO.selectAllAtores()
+        let atoresArray = []
+
+        async function teste (atorJSON) {
+            async function teste2 (id){
+                let nacionalidadeAtor = await controllerPaises.getPaisesPorAtor(id)
+                return nacionalidadeAtor
+            }
+            atorJSON.nacionalidade = await teste2(atorJSON.id)
+        }
+
+        dadosAtores.forEach(async ator => await teste(ator))
+        
 
         if (dadosAtores) {
             if (dadosAtores.length > 0) {
@@ -22,10 +35,12 @@ const getListarAtores = async function () {
         } else {
             return message.ERROR_INTERNAL_SERVER_DB
         }
+    
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER 
     }
 }
+
 
 const getBuscarAtor = async (id) =>{
 
@@ -72,28 +87,62 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
             let novoAtorJSON = {}
 
             if (dadosAtor.nome == "" || dadosAtor.nome == undefined || dadosAtor.nome == null || dadosAtor.nome.length > 80 ||
-                dadosAtor.cpf == "" || dadosAtor.cpf == undefined || dadosAtor.cpf == null || dadosAtor.cpf.length > 18 ||
-                dadosAtor.telefone == "" || dadosAtor.telefone == undefined || dadosAtor.telefone == null || dadosAtor.telefone.length > 15 ||
-                dadosAtor.email == "" || dadosAtor.email == undefined || dadosAtor.email == null || dadosAtor.email.length > 50 ||
-                dadosAtor.senha == "" || dadosAtor.senha == undefined || dadosAtor.senha == null || dadosAtor.senha.length > 20
+            dadosAtor.nome_artistico == "" || dadosAtor.nome_artistico == undefined || dadosAtor.nome_artistico == null || dadosAtor.nome_artistico.length > 18 ||
+            dadosAtor.data_nascimento == "" || dadosAtor.data_nascimento == undefined || dadosAtor.data_nascimento == null || dadosAtor.data_nascimento.length > 15  ||
+            dadosAtor.biografia == "" || dadosAtor.biografia == undefined || dadosAtor.biografia == null || 
+            dadosAtor.nacionalidade.length == 0
             ) {
                 return message.ERROR_REQUIRED_FIELDS
             } else {
 
+                let validateFalecimento = false
+                let validateFoto = false
 
-                    let novoAtor = await atoresDAO.insertAtor(dadosAtor)
-                    let idNovoAtor = await atoresDAO.selectLastInsertId()
+                //verificar a quantidade de caracteres da data de falecimento
+                if (dadosAtor.data_falecimento != null && dadosAtor.data_falecimento != "" && dadosAtor.data_falecimento != undefined) {
+                    if (dadosAtor.data_falecimento.length != 10){
+                        return message.ERROR_REQUIRED_FIELDS //400
+                    }else
+                        validateFalecimento = true
+                } else {
+                    validateFalecimento = true
+                }
+                //verificar a quantidade de caracteres da foto
+                if (dadosAtor.foto != null && dadosAtor.foto != "" && dadosAtor.foto != undefined) {
+                    if (dadosAtor.foto.length > 200){
+                        return message.ERROR_REQUIRED_FIELDS //400
+                    }
 
-                    if (novoAtor) {
-                        novoAtorJSON.ator = dadosAtor
-                        novoAtorJSON.ator.id = idNovoAtor
-                        novoAtorJSON.status = message.SUCCESS_CREATED_ITEM.status
-                        novoAtorJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
-                        novoAtorJSON.message = message.SUCCESS_CREATED_ITEM.message
+                    else
+                        validateFoto = true
+                } else {
+                    validateFoto = true
+                }
 
-                        return novoAtorJSON 
-                    } else {
-                        return message.ERROR_INTERNAL_SERVER_DB 
+                    if(validateFalecimento && validateFoto){
+                        let novoAtor = await atoresDAO.insertAtor(dadosAtor)
+                        let idNovoAtor = await atoresDAO.selectLastInsertId()
+
+                        let novaNacionalidadeAtor 
+                        dadosAtor.nacionalidade.forEach(async idNacionalidade =>{
+                            if(!isNaN(idNacionalidade))
+                            novaNacionalidadeAtor = await atoresDAO.insertNacionalidadeAtor(idNovoAtor, idNacionalidade)
+                            else
+                            return message.ERROR_INVALID_VALUE
+                        })
+
+                        let atorInserido = await atoresDAO.selectByIdAtor(idNovoAtor)
+    
+                        if (novoAtor && novaNacionalidadeAtor) {
+                            novoAtorJSON.ator = atorInserido
+                            novoAtorJSON.status = message.SUCCESS_CREATED_ITEM.status
+                            novoAtorJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
+                            novoAtorJSON.message = message.SUCCESS_CREATED_ITEM.message
+    
+                            return novoAtorJSON 
+                        } else {
+                            return message.ERROR_INTERNAL_SERVER_DB 
+                        }
                     }
 
                 }
@@ -119,9 +168,10 @@ const setExcluirAtor = async function (id) {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
             return message.ERROR_INVALID_ID
         } else {
-            let atorDeletado = await atoresDAO.deleteAtor(idAtor)
-
-            if (atorDeletado) {
+            let nacionalidadeAtorDeletada = await atoresDAO.deleteNacionalidadeAtor(idAtor)
+            // let atorDeletado = await atoresDAO.deleteAtor(idAtor)
+            
+            if (nacionalidadeAtorDeletada) {
                 return message.SUCCESS_DELETED_ITEM 
 
             } else {
@@ -148,10 +198,10 @@ const setAtualizarAtor = async function (id, dados, contentType){
             } else {
 
                 if (dadosAtor.nome == "" || dadosAtor.nome == undefined || dadosAtor.nome == null || dadosAtor.nome.length > 80 ||
-                dadosAtor.cpf == "" || dadosAtor.cpf == undefined || dadosAtor.cpf == null || dadosAtor.cpf.length > 18 ||
-                dadosAtor.telefone == "" || dadosAtor.telefone == undefined || dadosAtor.telefone == null || dadosAtor.telefone.length > 15 ||
-                dadosAtor.email == "" || dadosAtor.email == undefined || dadosAtor.email == null || dadosAtor.email.length > 50 ||
-                dadosAtor.senha == "" || dadosAtor.senha == undefined || dadosAtor.senha == null || dadosAtor.senha.length > 20
+                dadosAtor.nome_artistico == "" || dadosAtor.nome_artistico == undefined || dadosAtor.nome_artistico == null || dadosAtor.nome_artistico.length > 18 ||
+                dadosAtor.data_nascimento == "" || dadosAtor.data_nascimento == undefined || dadosAtor.data_nascimento == null || dadosAtor.data_nascimento.length > 15 ||
+                dadosAtor.data_falecimento == "" || dadosAtor.data_falecimento == undefined || dadosAtor.data_falecimento == null || dadosAtor.data_falecimento.length > 50 ||
+                dadosAtor.biografia == "" || dadosAtor.biografia == undefined || dadosAtor.biografia == null || dadosAtor.biografia.length > 20
                 ) {
                     return message.ERROR_REQUIRED_FIELDS
                 } else {

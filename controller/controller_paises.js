@@ -68,6 +68,41 @@ const getBuscarPais = async (id) => {
 
 }
 
+//para pegar a nacionalidade do ator e incluir no JSON da função "Get Atores"
+const getPaisesPorAtor = async (id)=>{
+    let idAtor = id
+
+    try {
+        if (idAtor == "" || idAtor == undefined || isNaN(idAtor)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let paisArray = []
+
+            let dadosPaises = await paisesDAO.selectByAtorPais(idAtor)
+
+            dadosPaises.forEach(pais =>{
+                paisArray.push(pais)
+            })
+
+            if (dadosPaises) {
+
+                if (dadosPaises.length > 0) {
+                    return paisArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+        return [message.ERROR_INTERNAL_SERVER]
+    }
+}
+
 const setInserirNovoPais = async (dadosPais, contentType) => {
 
     try {
@@ -218,6 +253,7 @@ const setExcluirPais = async (id) => {
 module.exports = {
     getListarPaises,
     getBuscarPais,
+    getPaisesPorAtor,
     setInserirNovoPais,
     setExcluirPais,
     setAtualizarPais

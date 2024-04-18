@@ -10,7 +10,7 @@
 
 const ERROR_INVALID_ID =   {status: false, status_code: 400, message: 'O ID encaminhado na requisição não é váldo'}
 
-const ERROR_INVALID_VALUE = {status: false, status_code: 400, message: 'O valor encaminhado na requisição não é váldo'}
+const ERROR_INVALID_VALUE = {status: false, status_code: 400, message: 'Um valor encaminhado na requisição não é váldo'}
 
 const ERROR_REQUIRED_FIELDS = {status: false, status_code: 400, message: 'Existem campos requeridos que não foram preenchidos ou não atendem aos critérios de digitação'}
 

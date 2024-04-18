@@ -50,6 +50,26 @@ const selectByIdPais = async (id) =>{
 
 }
 
+const selectByAtorPais = async (idAtor) =>{
+    try{
+        let sql = `select tbl_pais.id, tbl_pais.gentilico, tbl_pais.sigla, 
+        tbl_pais.bandeira from tbl_pais inner join tbl_nacionalidade_ator 
+        on tbl_pais.id=tbl_nacionalidade_ator.pais_id inner join tbl_ator 
+        on tbl_nacionalidade_ator.ator_id= tbl_ator.id where tbl_ator.id = ${idAtor};
+        `
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result)
+        return result
+        else
+        return false
+
+    }catch(error){
+
+        return false
+    }
+}
+
 const insertPais = async (dadosPais) =>{
 
     let sql 
@@ -170,6 +190,7 @@ module.exports = {
     selectAllPaises,
     selectByIdPais,
     selectLastInsertId,
+    selectByAtorPais,
     insertPais,
     deletePais,
     updatePais

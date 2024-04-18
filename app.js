@@ -502,7 +502,7 @@ app.get('/v2/AcmeFilmes/ator/:id', cors(), async function (request, response) {
 
 })
 
-app.post('/v2/AcmeFilmes/usuario', cors(), bodyParserJSON, async function(request, response){
+app.post('/v2/AcmeFilmes/ator', cors(), bodyParserJSON, async function(request, response){
 
     //recebe o content type da requisição
     let contentType = request.header('content-type')
@@ -511,24 +511,24 @@ app.post('/v2/AcmeFilmes/usuario', cors(), bodyParserJSON, async function(reques
     let dadosBody = request.body
 
     //encaminha os dados para a controller enviar para o DAO
-    let resultDadosNovoUsuario = await controllerUsuarios.setInserirNovoUsuario(dadosBody, contentType)
+    let resultDadosNovoAtor = await controllerAtores.setInserirNovoAtor(dadosBody, contentType)
     
-    response.status(resultDadosNovoUsuario.status_code)
-    response.json(resultDadosNovoUsuario)
+    response.status(resultDadosNovoAtor.status_code)
+    response.json(resultDadosNovoAtor)
 
 })
 
-app.delete('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+app.delete('/v2/AcmeFilmes/ator/:id', cors(), bodyParserJSON, async function(request, response){
 
-    let idUsuario = request.params.id
+    let idAtor = request.params.id
 
-    let usuarioDeletado = await controllerUsuarios.setExcluirUsuario(idUsuario)
+    let atorDeletado = await controllerAtores.setExcluirAtor(idAtor)
 
-    response.json(usuarioDeletado)
-    response.status(usuarioDeletado.status_code)
+    response.json(atorDeletado)
+    response.status(atorDeletado.status_code)
 })
 
-app.put('/v2/AcmeFilmes/usuario/:id', cors(), bodyParserJSON, async function(request, response){
+app.put('/v2/AcmeFilmes/ator/:id', cors(), bodyParserJSON, async function(request, response){
 
     let idUsuario = request.params.id
 
