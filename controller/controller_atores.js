@@ -46,14 +46,12 @@ const getBuscarAtor = async (id) =>{
             let atorJSON = {}
 
             let dadosAtor = await atoresDAO.selectByIdAtor(idAtor)
-            console.log(dadosAtor)
-
         
             if (dadosAtor) {
 
                 if (dadosAtor.length > 0) {
                     atorJSON.ator = dadosAtor
-                    dadosAtor[0].nacionalidade = await controllerAtores.getAtoresPorAtor(id);
+                    dadosAtor[0].nacionalidade = await controllerPaises.getPaisesPorAtor(id);
                     atorJSON.status_code = 200
 
                     return atorJSON
@@ -177,6 +175,7 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
     
                             return novoAtorJSON 
                         } else {
+                            console.log(dadosAtor)
                             return message.ERROR_INTERNAL_SERVER_DB 
                         }
                     }
@@ -188,6 +187,7 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
         }
 
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 
@@ -243,7 +243,7 @@ const setAtualizarAtor = async function (id, dados, contentType){
                     return message.ERROR_REQUIRED_FIELDS
                 } else {
 
-                        let nacionalidadesAntigas = await controllerAtores.getAtoresPorAtor(idAtor)
+                        let nacionalidadesAntigas = await controllerPaises.getPaisesPorAtor(idAtor)
                         let atorAtualizado = await atoresDAO.updateAtor(idAtor, dadosAtor)
 
                         let count = 0
@@ -257,7 +257,6 @@ const setAtualizarAtor = async function (id, dados, contentType){
 
                         let atorAtualizadoJSON = {}
 
-                        console.log(nacionalidadeAtorAtualizada)
                         if (atorAtualizado){
                             atorAtualizadoJSON.ator = dadosAtorAtualiazado.ator
                             atorAtualizadoJSON.status = message.SUCCESS_UPDATED_ITEM.status
