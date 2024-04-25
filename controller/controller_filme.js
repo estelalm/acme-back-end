@@ -19,7 +19,7 @@ const controllerProdutora = require('../controller/controller_produtoras.js')
 const setInserirNovoFilme = async function (dadosFilme, contentType) {
 
     try {
-
+        console.log(dadosFilme)
         if (String(contentType).toLowerCase() == 'application/json') {  //**
 
             //cria o objeto JSON para devolver os dados criados na requisição

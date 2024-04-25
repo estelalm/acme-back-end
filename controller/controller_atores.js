@@ -115,7 +115,7 @@ const getAtorPorFilme = async (id)=>{
 const setInserirNovoAtor = async function (dadosAtor, contentType) {
 
     try {
-
+        console.log(dadosAtor)
         if (String(contentType).toLowerCase() == 'application/json') {  
 
             let novoAtorJSON = {}
