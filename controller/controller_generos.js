@@ -98,7 +98,7 @@ const getGeneroPorFilme = async (id)=>{
         }
 
     } catch (error) {
-        console.log(error)
+    
         return [message.ERROR_INTERNAL_SERVER]
     }
 }
@@ -148,7 +148,7 @@ const setAtualizarGenero = async (id, dados, contentType) => {
     let dadosGenero = dados
 
     try {
-        console.log(contentType)
+
         if (String(contentType).toLowerCase() == 'application/json') {
 
             let generoAtualizadoJSON = {}

@@ -30,7 +30,7 @@ const getListarDiretores = async function () {
             return message.ERROR_INTERNAL_SERVER_DB;
         }
     } catch (error) {
-        console.log(error)
+        
         return message.ERROR_INTERNAL_SERVER;
     }
 };
@@ -66,10 +66,51 @@ const getBuscarDiretor = async (id) =>{
             }
         }
     } catch (error) {
-        console.log(error)
+        
         return message.ERROR_INTERNAL_SERVER
     }
 
+}
+
+const getDiretorPorFilme = async (id)=>{
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let diretorArray = []
+
+            let dadosDiretores = await diretoresDAO.selectByFilmeDiretor(idFilme)
+
+            await Promise.all(dadosDiretores.map(async (diretor) => {
+                let nacionalidadeDiretor = await controllerPaises.getPaisesPorDiretor(diretor.id);
+                diretor.nacionalidade = nacionalidadeDiretor;
+            }));
+
+            dadosDiretores.forEach(diretor =>{
+                diretorArray.push(diretor)
+            })
+
+            if (dadosDiretores) {
+
+                if (dadosDiretores.length > 0) {
+                    return diretorArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+        
+        return [message.ERROR_INTERNAL_SERVER]
+    }
 }
 
 const setInserirNovoDiretor = async function (dadosDiretor, contentType) {
@@ -175,7 +216,7 @@ const setExcluirDiretor = async function (id) {
             }
         }
     } catch (error) {
-        console.log(error)
+        
         return message.ERROR_INTERNAL_SERVER 
     }
 
@@ -216,7 +257,7 @@ const setAtualizarDiretor = async function (id, dados, contentType){
 
                         let diretorAtualizadoJSON = {}
 
-                        console.log(nacionalidadeDiretorAtualizada)
+           
                         if (diretorAtualizado){
                             diretorAtualizadoJSON.diretor = dadosDiretorAtualiazado.diretor
                             diretorAtualizadoJSON.status = message.SUCCESS_UPDATED_ITEM.status
@@ -236,7 +277,7 @@ const setAtualizarDiretor = async function (id, dados, contentType){
         }
 
     } catch (error) {
-        console.log(error)
+        
         return message.ERROR_INTERNAL_SERVER
     }
 
@@ -246,6 +287,7 @@ const setAtualizarDiretor = async function (id, dados, contentType){
 module.exports = {
     getListarDiretores,
     getBuscarDiretor,
+    getDiretorPorFilme,
     setInserirNovoDiretor,
     setExcluirDiretor,
     setAtualizarDiretor

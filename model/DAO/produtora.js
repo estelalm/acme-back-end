@@ -43,6 +43,30 @@ const selectByIdProdutora = async (id) =>{
 
 }
 
+const selectByFilmeProdutora = async (id) =>{
+
+    let idFilme = id
+    try{
+
+        let sql = `select tbl_produtora.id, tbl_produtora.nome, tbl_produtora.descricao
+                    from tbl_produtora 
+                    inner join tbl_produtora_filme on tbl_produtora.id=tbl_produtora_filme.produtora_id 
+                    inner join tbl_filme on tbl_produtora_filme.filme_id=tbl_filme.id
+                    where tbl_filme.id = ${idFilme};`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result)
+        return result
+        else
+        return false
+
+    }catch(error){
+        return false
+    }
+
+}
+
 const insertProdutora = async (dadosProdutora) =>{
 
     try{
@@ -136,6 +160,7 @@ module.exports = {
     selectAllProdutoras,
     selectByIdProdutora,
     selectLastInsertId,
+    selectByFilmeProdutora,
     insertProdutora,
     deleteProdutora,
     updateProdutora

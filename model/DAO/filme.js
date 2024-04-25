@@ -84,6 +84,169 @@ const insertFilme = async function (dadosFilme) {
 
 }
 
+const insertGeneroFilme = async function (idFilme, idGenero){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_genero_filme ( genero_id, filme_id ) values 
+            ( ${idGenero}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const insertAtorFilme = async function (idFilme, idAtor){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_ator_filme ( ator_id, filme_id ) values 
+            ( ${idAtor}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        return false
+    }
+}
+
+const insertDiretorFilme = async function (idFilme, idDiretor){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_diretor_filme ( diretor_id, filme_id ) values 
+            ( ${idDiretor}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        return false
+    }
+}
+
+
+const insertProdutoraFilme = async function (idFilme, idProdutora){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_produtora_filme ( produtora_id, filme_id ) values 
+            ( ${idProdutora}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const deleteGeneroFilme = async function (idFilme){
+
+    let sql
+
+    try {
+            sql = `delete from tbl_genero_filme where filme_id = ${idFilme}`
+            
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+const deleteAtorFilme = async function (idFilme){
+
+    let sql
+
+    try {
+            sql = `delete from tbl_ator_filme where filme_id = ${idFilme}`
+            
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const deleteDiretorFilme = async function (idFilme){
+
+    let sql
+
+    try {
+            sql = `delete from tbl_diretor_filme where filme_id = ${idFilme}`
+            
+        let result = await prisma.$executeRawUnsafe(sql)
+        
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+
+const deleteProdutoraFilme = async function (idFilme){
+
+    let sql
+
+    try {
+            sql = `delete from tbl_produtora_filme where filme_id = ${idFilme}`
+            
+        let result = await prisma.$executeRawUnsafe(sql)
+        console.log(result)
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        return false
+    }
+}
+
 //função para atualizar um filme no banco de dados
 const updateFilme = async function (id, dados) {
 
@@ -105,6 +268,7 @@ const updateFilme = async function (id, dados) {
             data_relancamento = ${dadosFilme.data_relancamento},
             valor_unitario = ${dadosFilme.valor_unitario},
             foto_capa = '${dadosFilme.foto_capa}',
+            trailer = '${dadosFilme.foto_capa}',
             classificacao_id = ${dadosFilme.classificacao},
             pais_origem_id = ${dadosFilme.pais_origem}
         
@@ -119,6 +283,7 @@ const updateFilme = async function (id, dados) {
         data_relancamento = null,
         valor_unitario = ${dadosFilme.valor_unitario},
         foto_capa = '${dadosFilme.foto_capa}',
+        trailer = '${dadosFilme.foto_capa}',
         classificacao_id = ${dadosFilme.classificacao},
         pais_origem_id = ${dadosFilme.pais_origem}
     
@@ -153,6 +318,7 @@ const deleteFilme = async function (id) {
             return false
 
     } catch (error) {
+        console.log(error)
         return false
     }
 
@@ -257,8 +423,16 @@ const selectLastInsertId = async function () {
 
 module.exports = {
     insertFilme,
+    insertAtorFilme,
+    insertGeneroFilme,
+    insertDiretorFilme, 
+    insertProdutoraFilme,
     updateFilme,
     deleteFilme,
+    deleteAtorFilme,
+    deleteDiretorFilme,
+    deleteProdutoraFilme,
+    deleteGeneroFilme,
     selectAllFilmes,
     selectByIdFilme,
     selectByNomeFilme,

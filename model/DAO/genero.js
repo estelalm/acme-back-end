@@ -82,7 +82,6 @@ const insertGenero = async (dadosGenero) =>{
         return false
 
     }catch(error){
-        console.log(error)
         return false
     }
 }
@@ -148,7 +147,6 @@ const selectLastInsertId = async function () {
         return false
     }
     }catch(error){
-        console.log(error)
         return false
     }
 

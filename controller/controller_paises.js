@@ -27,7 +27,6 @@ const getListarPaises = async () => {
         }
 
     } catch (error) {
-        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 

@@ -107,7 +107,7 @@ const insertNacionalidadeAtor = async function(idAtor, idNacionalidade){
     try {
 
         let sql = `INSERT INTO tbl_nacionalidade_ator 
-            (ator_id, ator_id) values
+            (ator_id, nacionalidade_id) values
             ('${idAtor}', ${idNacionalidade})`
 
         let result = await prisma.$executeRawUnsafe(sql)

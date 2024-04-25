@@ -11,6 +11,9 @@ const filmesDAO = require('../model/DAO/filme.js')
 const controllerClassificacoes = require('../controller/controller_classificacao.js')
 const controllerPaises = require('../controller/controller_paises.js')
 const controllerGeneros = require('../controller/controller_generos.js')
+const controllerAtores = require('../controller/controller_atores.js')
+const controllerDiretores = require('../controller/controller_diretores.js')
+const controllerProdutora = require('../controller/controller_produtoras.js')
 
 //função para inserir um novo filme
 const setInserirNovoFilme = async function (dadosFilme, contentType) {
@@ -57,11 +60,47 @@ const setInserirNovoFilme = async function (dadosFilme, contentType) {
                     let novoFilme = await filmesDAO.insertFilme(dadosFilme)
                     let idNovoFilme = await filmesDAO.selectLastInsertId()
 
+                    dadosFilme.generos.forEach(async idGenero =>{
+                        let novoGeneroFilme
+                        if(!isNaN(idGenero))
+                        novoGeneroFilme = await filmesDAO.insertGeneroFilme(idNovoFilme, idGenero)
+                        else
+                        return message.ERROR_INVALID_VALUE
+                    })
+
+                    dadosFilme.elenco.forEach(async idAtor =>{
+                        let novoAtorFilme
+                        
+                        if(!isNaN(idAtor))
+                        novoAtorFilme = await filmesDAO.insertAtorFilme(idNovoFilme, idAtor)
+                        else
+                        return message.ERROR_INVALID_VALUE
+                    })
+
+                    dadosFilme.diretor.forEach(async idDiretor =>{
+                        let novoDiretorFilme
+                        if(!isNaN(idDiretor))
+                        novoDiretorFilme = await filmesDAO.insertDiretorFilme(idNovoFilme, idDiretor)
+                        else
+                        return message.ERROR_INVALID_VALUE
+                    })
+
+                    dadosFilme.produtora.forEach(async idProdutora =>{
+                        let novaProdutoraFIlme
+                        if(!isNaN(idProdutora))
+                        novaProdutoraFilme = await filmesDAO.insertProdutoraFilme(idNovoFilme, idProdutora)
+                        else
+                        return message.ERROR_INVALID_VALUE
+                    })
+
+
+                    let filmeInserido = await getBuscarFilme(idNovoFilme)
+                    
 
                     //validação para verificar se o DAO inseriu os dados no banco
                     if (novoFilme) {
                         //cria o JSON de retorno dos dados (201)
-                        novoFilmeJSON.filme = dadosFilme
+                        novoFilmeJSON.filme = filmeInserido
                         novoFilmeJSON.filme.id = idNovoFilme
                         novoFilmeJSON.status = message.SUCCESS_CREATED_ITEM.status
                         novoFilmeJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
@@ -81,6 +120,7 @@ const setInserirNovoFilme = async function (dadosFilme, contentType) {
         }
 
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 
@@ -148,7 +188,6 @@ const setAtualizarFilme = async function (id, dadosFilme, contentType) {
         }
 
     } catch (error) {
-        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 
@@ -165,9 +204,16 @@ const setExcluirFilme = async function (id) {
             //caso seja inválido, envia a mensagem da config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
             return message.ERROR_INVALID_ID
         } else {
+
+            let atoresDeletados = await filmesDAO.deleteAtorFilme(idFilme)
+            let generosDeletados = await filmesDAO.deleteGeneroFilme(idFilme)
+            let produtorasDeletadas = await filmesDAO.deleteProdutoraFilme(idFilme)
+            let diretoresDeletados = await filmesDAO.deleteDiretorFilme(idFilme)
             let filmeDeletado = await filmesDAO.deleteFilme(idFilme)
 
-            if (filmeDeletado) {
+
+            console.log(filmeDeletado, atoresDeletados, generosDeletados, produtorasDeletadas, diretoresDeletados)
+            if (filmeDeletado && atoresDeletados && generosDeletados && produtorasDeletadas && diretoresDeletados) {
                 return message.SUCCESS_DELETED_ITEM //201
 
             } else {
@@ -202,10 +248,26 @@ const getListarFilmes = async function () {
             filme.pais_origem = paisFilme;
         }));
 
-        await Promise.all(dadosFilmes.map(async (ator) => {
-            let generoFilme = await controllerGeneros.getGeneroPorFilme(ator.id);
-            ator.generos = generoFilme;
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+            filme.generos = generoFilme;
         }));
+
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+            filme.elenco = atoresFilme;
+        }));
+
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+            filme.diretor = diretoresFilme;
+        }));
+
+        await Promise.all(dadosFilmes.map(async (filme) => {
+            let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+            filme.produtora = produtorasFilme;
+        }));
+
 
         //validação para verificar se o DAO retornou dados
         if (dadosFilmes) {
@@ -225,7 +287,7 @@ const getListarFilmes = async function () {
             return message.ERROR_INTERNAL_SERVER_DB
         }
     } catch (error) {
-        console.log(error)
+
         return message.ERROR_INTERNAL_SERVER //500: erro na controller
     }
 }
@@ -247,12 +309,46 @@ const getBuscarFilme = async function (id) {
 
             //chama a função do DAO que retorna os filmes do banco
             let dadosFilme = await filmesDAO.selectByIdFilme(idFilme)
+            
+
+            //this is saying dadosFilme is undefined, so is the filme.id
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+                filme.classificacao = classificacaoFilme;
+            }));
+    
+            //from here id doesn't get undefined, why is that??
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+                filme.pais_origem = paisFilme;
+            }));
+    
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+                filme.generos = generoFilme;
+            }));
+    
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+                filme.elenco = atoresFilme;
+            }));
+    
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+                filme.diretor = diretoresFilme;
+            }));
+    
+            await Promise.all(dadosFilme.map(async (filme) => {
+                let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+                filme.produtora = produtorasFilme;
+            }));
+
             //validação para verificar se o DAO retornou dados
             if (dadosFilme) {
                 //cria os atributos para reornar ao app
 
                 if (dadosFilme.length > 0) {
-
+                    
                     filmeJSON.filme = dadosFilme
                     filmeJSON.status_code = 200
 

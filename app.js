@@ -174,7 +174,6 @@ app.delete('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(re
 
 
 app.put('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(request, response){
-    console.log('teste')
     let idFilme = request.params.id
 
     let contentType = request.header('content-type')

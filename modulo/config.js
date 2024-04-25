@@ -14,7 +14,7 @@ const ERROR_INVALID_VALUE = {status: false, status_code: 400, message: 'Um valor
 
 const ERROR_REQUIRED_FIELDS = {status: false, status_code: 400, message: 'Existem campos requeridos que não foram preenchidos ou não atendem aos critérios de digitação'}
 
-const ERROR_NOT_FOUND = {status: false, status_code: 404, message: 'Não foi encontado nenhum item'}
+const ERROR_NOT_FOUND = {status: false, status_code: 404, message: 'Não foi encontrado nenhum item'}
 
 const ERROR_CONTENT_TYPE = {status: false, status_code: 415, message: 'O content-type encaminhado na requisição não é suportado pelo servidor. Deve-se encaminhar apenas requisições com aplication/json'}
 

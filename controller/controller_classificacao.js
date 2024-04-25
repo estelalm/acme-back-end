@@ -59,7 +59,6 @@ const getBuscarClassificacao = async (id) => {
         }
 
     } catch (error) {
-        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 }
@@ -67,7 +66,6 @@ const getBuscarClassificacao = async (id) => {
 const getBuscarClassficacaoFilme = async (id) => {
 
     let idFilme = id
-
     try {
         if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
             return message.ERROR_INVALID_ID
@@ -94,7 +92,7 @@ const getBuscarClassficacaoFilme = async (id) => {
         }
 
     } catch (error) {
-        console.log(error)
+
         return message.ERROR_INTERNAL_SERVER
     }
 }
@@ -169,7 +167,6 @@ const setAtualizarClassificacao = async (id, dadosClassificacao, contentType) =>
 
         
     } catch (error) {
-        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 

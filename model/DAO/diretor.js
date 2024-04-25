@@ -31,6 +31,30 @@ const selectByIdDiretor = async function (id){
    }
     
 }
+const selectByFilmeDiretor = async (id) =>{
+
+    let idFilme = id
+    try{
+
+        let sql = `select tbl_diretor.id, tbl_diretor.nome, tbl_diretor.nome_artistico, tbl_diretor.data_nascimento, 
+                   tbl_diretor.data_falecimento, tbl_diretor.biografia, tbl_diretor.foto
+                    from tbl_diretor 
+                    inner join tbl_diretor_filme on tbl_diretor.id=tbl_diretor_filme.diretor_id 
+                    inner join tbl_filme on tbl_diretor_filme.filme_id=tbl_filme.id
+                    where tbl_filme.id = ${idFilme};`
+
+        let result = await prisma.$queryRawUnsafe(sql)
+
+        if(result)
+        return result
+        else
+        return false
+
+    }catch(error){
+        return false
+    }
+
+}
 
 const insertDiretor = async function (dadosDiretor){
 
@@ -244,6 +268,7 @@ const selectLastInsertId = async function () {
 module.exports = {
     selectAllDiretores,
     selectByIdDiretor,
+    selectByFilmeDiretor,
     selectLastInsertId,
     deleteDiretor,
     insertDiretor,

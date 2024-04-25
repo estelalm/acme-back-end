@@ -67,6 +67,42 @@ const getBuscarProdutora = async (id) => {
 
 }
 
+const getProdutoraPorFilme = async (id)=>{
+    let idFilme = id
+
+    try {
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            return [message.ERROR_INVALID_ID]
+        } else {
+
+            let produtoraArray = []
+
+            let dadosProdutoras = await produtorasDAO.selectByFilmeProdutora(idFilme)
+
+            dadosProdutoras.forEach(produtora =>{
+                produtoraArray.push(produtora)
+            })
+
+            if (dadosProdutoras) {
+
+                if (dadosProdutoras.length > 0) {
+                    return produtoraArray
+
+                } else {
+                    return [message.ERROR_NOT_FOUND]
+                }
+            } else {
+                
+                return [message.ERROR_INTERNAL_SERVER_DB]
+            }
+        }
+
+    } catch (error) {
+        console.log(error)
+        return [message.ERROR_INTERNAL_SERVER]
+    }
+}
+
 const setInserirNovaProdutora = async (dadosProdutora, contentType) => {
 
     try {
@@ -181,6 +217,7 @@ const setExcluirProdutora = async (id) => {
 module.exports = {
     getListarProdutoras,
     getBuscarProdutora,
+    getProdutoraPorFilme,
     setInserirNovaProdutora,
     setExcluirProdutora,
     setAtualizarProdutora

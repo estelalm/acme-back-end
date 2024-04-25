@@ -1,45 +1,9 @@
 const message = require('../modulo/config.js')
 const atoresDAO = require('../model/DAO/ator.js')
 const controllerAtores = require('../controller/controller_atores.js')
+const controllerPaises = require('../controller/controller_paises.js')
 
-// const getListarAtores = async function () {
 
-//     try {
-//         let atoresJSON = {}
-
-//         let dadosAtores = await atoresDAO.selectAllAtores()
-//         let atoresArray = []
-
-//         async function teste (atorJSON) {
-//             async function teste2 (id){
-//                 let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(id)
-//                 return nacionalidadeAtor
-//             }
-//             atorJSON.nacionalidade = await teste2(atorJSON.id)
-//         }
-
-//         dadosAtores.forEach(async ator => await teste(ator))
-        
-
-//         if (dadosAtores) {
-//             if (dadosAtores.length > 0) {
-//                 atoresJSON.atores = dadosAtores
-//                 atoresJSON.quantidade = dadosAtores.length
-//                 atoresJSON.status_code = 200
-
-//                 return atoresJSON
-//             } else {
-//                 return message.ERROR_NOT_FOUND
-//             }
-
-//         } else {
-//             return message.ERROR_INTERNAL_SERVER_DB
-//         }
-    
-//     } catch (error) {
-//         return message.ERROR_INTERNAL_SERVER 
-//     }
-// }
 const getListarAtores = async function () {
     try {
         let atoresJSON = {};
@@ -48,10 +12,9 @@ const getListarAtores = async function () {
         //faz tudo ser executado antes de passar para a próxima ação -> map devolve um array atualizado como resultado
         //da função, sem precisar do .push
         await Promise.all(dadosAtores.map(async (ator) => {
-            let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(ator.id);
+            let nacionalidadeAtor = await controllerPaises.getPaisesPorAtor(ator.id);
             ator.nacionalidade = nacionalidadeAtor;
         }));
-
 
         if (dadosAtores) {
             if (dadosAtores.length > 0) {
@@ -123,7 +86,7 @@ const getAtorPorFilme = async (id)=>{
             let dadosAtores = await atoresDAO.selectByFilmeAtor(idFilme)
 
             await Promise.all(dadosAtores.map(async (ator) => {
-                let nacionalidadeAtor = await controllerAtores.getAtoresPorAtor(ator.id);
+                let nacionalidadeAtor = await controllerPaises.getPaisesPorAtor(ator.id);
                 ator.nacionalidade = nacionalidadeAtor;
             }));
 
@@ -326,5 +289,6 @@ module.exports = {
     getBuscarAtor,
     setInserirNovoAtor,
     setExcluirAtor,
-    setAtualizarAtor
+    setAtualizarAtor,
+    getAtorPorFilme
 }
