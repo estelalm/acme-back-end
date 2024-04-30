@@ -240,6 +240,7 @@ const setAtualizarAtor = async function (id, dados, contentType){
                 dadosAtor.data_nascimento == "" || dadosAtor.data_nascimento == undefined || dadosAtor.data_nascimento == null || dadosAtor.data_nascimento.length > 15 ||
                 dadosAtor.biografia == "" || dadosAtor.biografia == undefined || dadosAtor.biografia == null 
                 ) {
+
                     return message.ERROR_REQUIRED_FIELDS
                 } else {
 
@@ -257,7 +258,7 @@ const setAtualizarAtor = async function (id, dados, contentType){
 
                         let atorAtualizadoJSON = {}
 
-                        if (atorAtualizado){
+                        if (atorAtualizado && nacionalidadeAtorAtualizada){
                             atorAtualizadoJSON.ator = dadosAtorAtualiazado.ator
                             atorAtualizadoJSON.status = message.SUCCESS_UPDATED_ITEM.status
                             atorAtualizadoJSON.status_code = message.SUCCESS_UPDATED_ITEM.status_code

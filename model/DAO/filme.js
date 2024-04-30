@@ -19,7 +19,7 @@ const insertFilme = async function (dadosFilme) {
     let sql
 
     try {
-
+        
         if (dadosFilme.data_relancamento != null && dadosFilme.data_relancamento != "" && dadosFilme.data_relancamento != undefined) {
             sql = `insert into tbl_filme ( nome, 
                 sinopse, 
@@ -167,6 +167,67 @@ const insertProdutoraFilme = async function (idFilme, idProdutora){
     }
 }
 
+const insertFilmeComprado = async function (idUsuario, idFilme){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_comprado ( usuario_id, filme_id ) values 
+            ( ${idUsuario}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+const insertFilmeSalvo = async function (idUsuario, idFilme){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_salvo ( usuario_id, filme_id ) values 
+            ( ${idUsuario}, ${idFilme})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+const insertAvaliacaoFilme = async function (idUsuario, idFilme, avaliacao){
+
+    let sql
+
+    try {
+            sql = `insert into tbl_avaliacao ( usuario_id, filme_id, avaliacao ) values 
+            ( ${idUsuario}, ${idFilme}, ${avaliacao})`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 const deleteGeneroFilme = async function (idFilme){
 
     let sql
@@ -236,7 +297,6 @@ const deleteProdutoraFilme = async function (idFilme){
             sql = `delete from tbl_produtora_filme where filme_id = ${idFilme}`
             
         let result = await prisma.$executeRawUnsafe(sql)
-        console.log(result)
         if (result)
             return true
         else
@@ -252,7 +312,7 @@ const updateFilme = async function (id, dados) {
 
     let idFilme = id
     let dadosFilme = dados
-
+    
     try{
 
         let sql
@@ -298,6 +358,7 @@ const updateFilme = async function (id, dados) {
         return false
 
     }catch(error){
+        console.log(error)
         return false
     }
 }
@@ -322,6 +383,68 @@ const deleteFilme = async function (id) {
         return false
     }
 
+}
+
+const deleteFilmeComprado = async function (usuarioId, filmeId) {
+
+    let idUsuario = usuarioId
+    let idFilme = filmeId
+
+    try {
+        let sql = `delete from tbl_comprado where filme_id = ${idFilme} and usuario_id = ${idUsuario}`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+
+}
+
+const deleteFilmeSalvo = async function (usuarioId, filmeId) {
+
+    let idUsuario = usuarioId
+    let idFilme = filmeId
+
+    try {
+        let sql = `delete from tbl_salvo where filme_id = ${idFilme} and usuario_id = ${idUsuario}`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+
+}
+
+const deleteAvaliacoesFilme = async function (idFilme){
+
+    try {
+        let sql = `delete from tbl_avaliacao where filme_id = ${idFilme};`
+
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
 }
 
 //função para listar todos os filmes banco de dados
@@ -359,6 +482,50 @@ const selectByIdFilme = async function (id) {
 
 
 }
+
+const selectFilmesCompradosUsuario = async function(id){
+    try {
+        let sql = ` select distinct(tbl_filme.id), nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+                    join tbl_comprado on tbl_filme.id=tbl_comprado.filme_id where tbl_comprado.usuario_id = ${id}`
+        
+        //encaminha o script da variável sql para o banco de dados
+        let rsFilmes = await prisma.$queryRawUnsafe(sql)
+        // group_concat(distinct tbl_produtora.nome separator ", ") as produtora from tbl_filme
+        return rsFilmes
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+const selectFilmesSalvosUsuario = async function(id){
+    try {
+        let sql = ` select distinct(tbl_filme.id), nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+                    join tbl_salvo on tbl_filme.id=tbl_salvo.filme_id where tbl_salvo.usuario_id = ${id}`
+        
+        //encaminha o script da variável sql para o banco de dados
+        let rsFilmes = await prisma.$queryRawUnsafe(sql)
+        // group_concat(distinct tbl_produtora.nome separator ", ") as produtora from tbl_filme
+        return rsFilmes
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
+const selectAvaliacaoFilme = async function(id){
+    try {
+        let sql = `select truncate(avg(avaliacao), 1) as avaliacao from tbl_avaliacao where filme_id = ${id}`
+        
+        //encaminha o script da variável sql para o banco de dados
+        let rsFilmes = await prisma.$queryRawUnsafe(sql)
+        // group_concat(distinct tbl_produtora.nome separator ", ") as produtora from tbl_filme
+        return rsFilmes
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+
 
 const selectByNomeFilme = async function (nomeFilme) {
 
@@ -427,17 +594,26 @@ module.exports = {
     insertGeneroFilme,
     insertDiretorFilme, 
     insertProdutoraFilme,
+    insertFilmeComprado,
+    insertAvaliacaoFilme,
+    insertFilmeSalvo,
     updateFilme,
     deleteFilme,
     deleteAtorFilme,
     deleteDiretorFilme,
     deleteProdutoraFilme,
     deleteGeneroFilme,
+    deleteFilmeComprado,
+    deleteFilmeSalvo,
     selectAllFilmes,
     selectByIdFilme,
     selectByNomeFilme,
     selectByFiltro,
     selectLastInsertId,
+    selectFilmesCompradosUsuario,
+    selectFilmesSalvosUsuario,
+    selectAvaliacaoFilme,
     deleteFilme,
+    deleteAvaliacoesFilme,
     updateFilme
 }

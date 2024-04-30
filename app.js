@@ -188,6 +188,115 @@ app.put('/v2/AcmeFilmes/filme/:id', cors(), bodyParserJSON, async function(reque
 
 })
 
+
+//filmes  do usuário
+
+app.get('/v2/AcmeFilmes/filmes/comprados/usuario/:id', cors(), async function (request, response) {
+
+    let idUsuario = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosFilme = await controllerFilmes.getFilmesCompradosUsuario(idUsuario)
+
+        response.status(dadosFilme.status_code)
+        response.json(dadosFilme)
+
+})
+app.post('/v2/AcmeFilmes/filme/comprado/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.query.id_usuario
+    let idFilme = request.query.id_filme
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoFilmeComprado = await controllerFilmes.setInserirNovoFilmeComprado(idUsuario, idFilme)
+    
+    response.status(resultDadosNovoFilmeComprado.status_code)
+    response.json(resultDadosNovoFilmeComprado)
+
+})
+
+app.delete('/v2/AcmeFilmes/filme/comprado/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.query.id_usuario
+    let idFilme = request.query.id_filme
+
+    let filmeDeletado = await controllerFilmes.setExcluirFilmeComprado(idUsuario, idFilme)
+
+    response.json(filmeDeletado)
+    response.status(filmeDeletado.status_code)
+})
+
+app.get('/v2/AcmeFilmes/filmes/salvos/usuario/:id', cors(), async function (request, response) {
+
+    let idUsuario = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosFilme = await controllerFilmes.getFilmesSalvosUsuario(idUsuario)
+
+        response.status(dadosFilme.status_code)
+        response.json(dadosFilme)
+
+})
+app.post('/v2/AcmeFilmes/filme/salvo/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.query.id_usuario
+    let idFilme = request.query.id_filme
+
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosNovoFilmeSalvo = await controllerFilmes.setInserirNovoFilmeSalvo(idUsuario, idFilme)
+    
+    response.status(resultDadosNovoFilmeSalvo.status_code)
+    response.json(resultDadosNovoFilmeSalvo)
+
+})
+
+app.delete('/v2/AcmeFilmes/filme/salvo/usuario', cors(), bodyParserJSON, async function(request, response){
+
+    let idUsuario = request.query.id_usuario
+    let idFilme = request.query.id_filme
+
+    let filmeDeletado = await controllerFilmes.setExcluirFilmeSalvo(idUsuario, idFilme)
+
+    response.json(filmeDeletado)
+    response.status(filmeDeletado.status_code)
+})
+
+//avaliação do filme
+app.get('/v2/AcmeFilmes/filme/avaliacao/:id', cors(), async function (request, response) {
+
+    let idFilme = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosFilme = await controllerFilmes.getAvaliacaoFilme(idFilme)
+
+        response.status(dadosFilme.status_code)
+        response.json(dadosFilme)
+
+})
+app.post('/v2/AcmeFilmes/filme/avaliacao/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idFilme = request.params.id
+    let dadosAvaliacao = request.body
+    let contentType = request.header('content-type')
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosAvaliacao = await controllerFilmes.setInserirAvaliacaoFilme(idFilme, contentType, dadosAvaliacao)
+    
+    response.status(resultDadosAvaliacao.status_code)
+    response.json(resultDadosAvaliacao)
+
+})
+
+app.delete('/v2/AcmeFilmes/filme/avaliacoes/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idFilme = request.params.id
+
+    let avaliacaoDeletada = await controllerFilmes.setExcluirAvaliacaoFilme(idFilme)
+
+    response.json(avaliacaoDeletada)
+    response.status(avaliacaoDeletada.status_code)
+})
+
+
 ///////////////////// GÊNEROS ///////////////////////////
 
 app.get('/v2/AcmeFilmes/generos', cors(), async function (request, response){

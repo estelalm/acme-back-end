@@ -159,6 +159,8 @@ const setInserirNovoDiretor = async function (dadosDiretor, contentType) {
                         let idNovoDiretor = await diretoresDAO.selectLastInsertId()
 
                         let novaNacionalidadeDiretor 
+
+                        console.log(dadosDiretor)
                         dadosDiretor.nacionalidade.forEach(async idNacionalidade =>{
                             if(!isNaN(idNacionalidade))
                             novaNacionalidadeDiretor = await diretoresDAO.insertNacionalidadeDiretor(idNovoDiretor, idNacionalidade)
@@ -253,6 +255,7 @@ const setAtualizarDiretor = async function (id, dados, contentType){
                             nacionalidadeDiretorAtualizada = await diretoresDAO.updateNacionalidadeDiretor(idDiretor, dadosDiretor.nacionalidade[count], nacionalidadeAntiga.id)
                             count ++
                         })
+
 
                         let dadosDiretorAtualiazado = await getBuscarDiretor(idDiretor)
 

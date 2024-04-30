@@ -172,13 +172,14 @@ const updateAtor = async function (id, dados){
     
 }
 
-const updateNacionalidadeAtor = async function (idAtor, idAtor, idAtorAntigo){
+const updateNacionalidadeAtor = async function (idAtor, idNacionalidadeNova, idNacionalidadeAntiga){
     try{
 
+        console.log
         let sql
             sql = `update tbl_nacionalidade_ator set 
-            ator_id = ${idAtor}
-            where ator_id = ${idAtor} and ator_id = ${idAtorAntigo}`
+            pais_id = ${idNacionalidadeNova}
+            where ator_id = ${idAtor} and pais_id = ${idNacionalidadeAntiga}`
 
 
         let result = await prisma.$executeRawUnsafe(sql)

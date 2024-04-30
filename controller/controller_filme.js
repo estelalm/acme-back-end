@@ -14,12 +14,13 @@ const controllerGeneros = require('../controller/controller_generos.js')
 const controllerAtores = require('../controller/controller_atores.js')
 const controllerDiretores = require('../controller/controller_diretores.js')
 const controllerProdutora = require('../controller/controller_produtoras.js')
+const { getFilmes } = require('./filmes_funcoes.js')
 
 //função para inserir um novo filme
 const setInserirNovoFilme = async function (dadosFilme, contentType) {
 
     try {
-        console.log(dadosFilme)
+        
         if (String(contentType).toLowerCase() == 'application/json') {  //**
 
             //cria o objeto JSON para devolver os dados criados na requisição
@@ -188,6 +189,7 @@ const setAtualizarFilme = async function (id, dadosFilme, contentType) {
         }
 
     } catch (error) {
+        console.log(error)
         return message.ERROR_INTERNAL_SERVER
     }
 
@@ -212,7 +214,6 @@ const setExcluirFilme = async function (id) {
             let filmeDeletado = await filmesDAO.deleteFilme(idFilme)
 
 
-            console.log(filmeDeletado, atoresDeletados, generosDeletados, produtorasDeletadas, diretoresDeletados)
             if (filmeDeletado && atoresDeletados && generosDeletados && produtorasDeletadas && diretoresDeletados) {
                 return message.SUCCESS_DELETED_ITEM //201
 
@@ -249,6 +250,14 @@ const getListarFilmes = async function () {
         }));
 
         await Promise.all(dadosFilmes.map(async (filme) => {
+            let avaliacaoFilme = await getAvaliacaoFilme(filme.id);
+            if(avaliacaoFilme.avaliacao)
+            filme.avaliacao = avaliacaoFilme.avaliacao;
+            else
+            filme.avaliacao = null
+        }));
+
+        await Promise.all(dadosFilmes.map(async (filme) => {
             let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
             filme.generos = generoFilme;
         }));
@@ -267,6 +276,7 @@ const getListarFilmes = async function () {
             let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
             filme.produtora = produtorasFilme;
         }));
+
 
 
         //validação para verificar se o DAO retornou dados
@@ -324,6 +334,14 @@ const getBuscarFilme = async function (id) {
             }));
     
             await Promise.all(dadosFilme.map(async (filme) => {
+                let avaliacaoFilme = await getAvaliacaoFilme(filme.id);
+                if(avaliacaoFilme.avaliacao)
+                filme.avaliacao = avaliacaoFilme.avaliacao;
+                else
+                filme.avaliacao = null
+            }));
+
+            await Promise.all(dadosFilme.map(async (filme) => {
                 let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
                 filme.generos = generoFilme;
             }));
@@ -342,6 +360,8 @@ const getBuscarFilme = async function (id) {
                 let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
                 filme.produtora = produtorasFilme;
             }));
+
+
 
             //validação para verificar se o DAO retornou dados
             if (dadosFilme) {
@@ -365,6 +385,360 @@ const getBuscarFilme = async function (id) {
     } catch (error) {
         return message.ERROR_INTERNAL_SERVER //500: erro na controller
     }
+}
+
+const getFilmesCompradosUsuario = async function (idUsuario) {
+
+    try {
+        //cria um objeto json
+        let filmesJSON = {}
+
+        //chama a função do DAO que retorna os filmes do banco
+        let dadosFilmes = await filmesDAO.selectFilmesCompradosUsuario(idUsuario)
+
+                //chama as funções que retornam outras informações do filme
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+                    filme.classificacao = classificacaoFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+                    filme.pais_origem = paisFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+                    filme.generos = generoFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+                    filme.elenco = atoresFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+                    filme.diretor = diretoresFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+                    filme.produtora = produtorasFilme;
+                }));
+        
+
+        //validação para verificar se o DAO retornou dados
+        if (dadosFilmes) {
+            //cria os atributos para reornar ao app
+
+            if (dadosFilmes.length > 0) {
+                filmesJSON.filmes = dadosFilmes
+                filmesJSON.quantidade = dadosFilmes.length
+                filmesJSON.status_code = 200
+
+                return filmesJSON
+            } else {
+                return message.ERROR_NOT_FOUND
+            }
+
+        } else {
+            return message.ERROR_INTERNAL_SERVER_DB
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500: erro na controller
+    }
+}
+
+const setInserirNovoFilmeComprado = async function (idUsuario, idFilme){
+
+    try {
+
+            //cria o objeto JSON para devolver os dados criados na requisição
+            let novoFilmeJSON = {}
+
+            //validação de campos obrigatórios ou com digitação inválida
+            if (idFilme == "" || idFilme == undefined || isNaN(idFilme) || idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)
+            ) {
+                return message.ERROR_INVALID_ID
+            } else {
+
+                    let novoFilmeComprado = await filmesDAO.insertFilmeComprado(idUsuario, idFilme)
+                    
+                    //validação para verificar se o DAO inseriu os dados no banco
+                    if (novoFilmeComprado) {
+                        //cria o JSON de retorno dos dados (201)
+                        // novoFilmeJSON.filme = filmeComprado
+                        novoFilmeJSON.status = message.SUCCESS_CREATED_ITEM.status
+                        novoFilmeJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
+                        novoFilmeJSON.message = message.SUCCESS_CREATED_ITEM.message
+
+                        return novoFilmeJSON //201
+                    } else {
+                        return message.ERROR_INTERNAL_SERVER_DB //500
+                    }
+
+            }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+
+}
+
+const setExcluirFilmeComprado = async function (idUsuario, idFilme) {
+
+    try {
+
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme), idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)) {
+            //caso seja inválido, envia a mensagem da config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+            return message.ERROR_INVALID_ID
+        } else {
+            let filmeCompradoDeletado = await filmesDAO.deleteFilmeComprado(idUsuario, idFilme)
+
+
+            if (filmeCompradoDeletado) {
+                return message.SUCCESS_DELETED_ITEM //201
+
+            } else {
+                return message.ERROR_INTERNAL_SERVER_DB //500: erro no banco de dados
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500: erro na controller
+    }
+
+}
+
+const getFilmesSalvosUsuario = async function (idUsuario) {
+
+    try {
+        //cria um objeto json
+        let filmesJSON = {}
+
+        //chama a função do DAO que retorna os filmes do banco
+        let dadosFilmes = await filmesDAO.selectFilmesSalvosUsuario(idUsuario)
+
+                //chama as funções que retornam outras informações do filme
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+                    filme.classificacao = classificacaoFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+                    filme.pais_origem = paisFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+                    filme.generos = generoFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+                    filme.elenco = atoresFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+                    filme.diretor = diretoresFilme;
+                }));
+        
+                await Promise.all(dadosFilmes.map(async (filme) => {
+                    let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+                    filme.produtora = produtorasFilme;
+                }));
+        
+
+        //validação para verificar se o DAO retornou dados
+        if (dadosFilmes) {
+            //cria os atributos para reornar ao app
+
+            if (dadosFilmes.length > 0) {
+                filmesJSON.filmes = dadosFilmes
+                filmesJSON.quantidade = dadosFilmes.length
+                filmesJSON.status_code = 200
+
+                return filmesJSON
+            } else {
+                return message.ERROR_NOT_FOUND
+            }
+
+        } else {
+            return message.ERROR_INTERNAL_SERVER_DB
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500: erro na controller
+    }
+}
+
+const getAvaliacaoFilme = async function (idFilme){
+
+    try {
+
+        let avaliacaoFilme = await filmesDAO.selectAvaliacaoFilme(idFilme)
+
+        if (avaliacaoFilme) {
+            //cria os atributos para reornar ao app
+
+            let filmeJSON = {}
+
+            if (avaliacaoFilme.length > 0  && avaliacaoFilme[0].avaliacao != null) {
+                filmeJSON.avaliacao = avaliacaoFilme[0].avaliacao
+                filmeJSON.status_code = 200
+
+                return filmeJSON
+            } else {
+                return message.ERROR_NOT_FOUND
+            }
+
+        } else {
+            return message.ERROR_INTERNAL_SERVER_DB
+        }
+        
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+    
+}
+
+
+const setExcluirAvaliacaoFilme = async function (idFilme) {
+
+    try {
+
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme)) {
+            //caso seja inválido, envia a mensagem da config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+            return message.ERROR_INVALID_ID
+        } else {
+            let avaliacoesDeletadas = await filmesDAO.deleteAvaliacoesFilme(idFilme)
+
+
+            if (avaliacoesDeletadas) {
+                return message.SUCCESS_DELETED_ITEM //201
+
+            } else {
+                return message.ERROR_INTERNAL_SERVER_DB //500: erro no banco de dados
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500: erro na controller
+    }
+
+}
+
+const setInserirNovoFilmeSalvo = async function (idUsuario, idFilme){
+
+    try {
+
+            //cria o objeto JSON para devolver os dados criados na requisição
+            let novoFilmeJSON = {}
+
+            //validação de campos obrigatórios ou com digitação inválida
+            if (idFilme == "" || idFilme == undefined || isNaN(idFilme) || idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)
+            ) {
+                return message.ERROR_INVALID_ID
+            } else {
+
+                    let novoFilmeSalvo = await filmesDAO.insertFilmeSalvo(idUsuario, idFilme)
+                    
+                    //validação para verificar se o DAO inseriu os dados no banco
+                    if (novoFilmeSalvo) {
+                        //cria o JSON de retorno dos dados (201)
+                        // novoFilmeJSON.filme = filmeComprado
+                        novoFilmeJSON.status = message.SUCCESS_CREATED_ITEM.status
+                        novoFilmeJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
+                        novoFilmeJSON.message = message.SUCCESS_CREATED_ITEM.message
+
+                        return novoFilmeJSON //201
+                    } else {
+                        return message.ERROR_INTERNAL_SERVER_DB //500
+                    }
+
+            }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+
+}
+
+const setInserirAvaliacaoFilme = async function (idFilme, contentType, dadosAvaliacao){
+
+    try {
+        if (String(contentType).toLowerCase() == 'application/json') {
+            //cria o objeto JSON para devolver os dados criados na requisição
+            let novoFilmeJSON = {}
+
+            let idUsuario = dadosAvaliacao.usuario
+            let avaliacao =  dadosAvaliacao.avaliacao
+
+            //validação de campos obrigatórios ou com digitação inválida
+            if (idFilme == "" || idFilme == undefined || isNaN(idFilme) 
+            || idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)
+            || avaliacao > 5 || avaliacao < 1
+            ) {
+                return message.ERROR_INVALID_ID
+            } else {
+
+                    let novoFilmeSalvo = await filmesDAO.insertAvaliacaoFilme(idUsuario, idFilme, avaliacao)
+                    
+                    //validação para verificar se o DAO inseriu os dados no banco
+                    if (novoFilmeSalvo) {
+                        //cria o JSON de retorno dos dados (201)
+                        // novoFilmeJSON.filme = filmeComprado
+                        novoFilmeJSON.status = message.SUCCESS_CREATED_ITEM.status
+                        novoFilmeJSON.status_code = message.SUCCESS_CREATED_ITEM.status_code
+                        novoFilmeJSON.message = message.SUCCESS_CREATED_ITEM.message
+
+                        return novoFilmeJSON //201
+                    } else {
+                        return message.ERROR_INTERNAL_SERVER_DB //500
+                    }
+
+            }
+        } else {
+            return message.ERROR_CONTENT_TYPE
+        }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+
+}
+
+const setExcluirFilmeSalvo = async function (idUsuario, idFilme) {
+
+    try {
+
+        if (idFilme == "" || idFilme == undefined || isNaN(idFilme), idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)) {
+            //caso seja inválido, envia a mensagem da config                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+            return message.ERROR_INVALID_ID
+        } else {
+            let filmeSalvoDeletado = await filmesDAO.deleteFilmeSalvo(idUsuario, idFilme)
+
+
+            if (filmeSalvoDeletado) {
+                return message.SUCCESS_DELETED_ITEM //201
+
+            } else {
+                return message.ERROR_INTERNAL_SERVER_DB //500: erro no banco de dados
+            }
+        }
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER //500: erro na controller
+    }
+
 }
 
 const getBuscarNomeFilme = async function (nome) {
@@ -441,7 +815,16 @@ module.exports = {
     getListarFilmes,
     getBuscarFilme,
     getBuscarNomeFilme,
+    getFilmesCompradosUsuario,
+    getFilmesSalvosUsuario,
     getFiltrarFilmes,
+    getAvaliacaoFilme,
+    setInserirNovoFilmeComprado,
+    setInserirNovoFilmeSalvo,
+    setInserirAvaliacaoFilme,
     setExcluirFilme,
+    setExcluirFilmeComprado,
+    setExcluirFilmeSalvo,
+    setExcluirAvaliacaoFilme,
     setAtualizarFilme
 }

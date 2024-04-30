@@ -48,7 +48,7 @@ const selectByFilmeClassificacao = async (id) =>{
 
     try{
 
-        let sql = ` select tbl_classificacao.id, tbl_classificacao.nome, nome_completo, descricao, sigla from tbl_classificacao 
+        let sql = ` select tbl_classificacao.id, tbl_classificacao.nome, nome_completo, descricao, sigla, imagem from tbl_classificacao 
         join tbl_filme on tbl_classificacao.id = tbl_filme.classificacao_id 
         where tbl_filme.id = ${id}`
 
