@@ -322,13 +322,11 @@ const getBuscarFilme = async function (id) {
             let dadosFilme = await filmesDAO.selectByIdFilme(idFilme)
             
 
-            //this is saying dadosFilme is undefined, so is the filme.id
             await Promise.all(dadosFilme.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
                 filme.classificacao = classificacaoFilme;
             }));
     
-            //from here id doesn't get undefined, why is that??
             await Promise.all(dadosFilme.map(async (filme) => {
                 let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
                 filme.pais_origem = paisFilme;
@@ -799,6 +797,44 @@ const getBuscarNomeFilme = async function (nome) {
             let filmesJSON = {}
 
             let dadosFilmes = await filmesDAO.selectByNomeFilme(nomeFilme)
+
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+                filme.classificacao = classificacaoFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+                filme.pais_origem = paisFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let avaliacaoFilme = await getAvaliacaoFilme(filme.id);
+                if(avaliacaoFilme.avaliacao)
+                filme.avaliacao = avaliacaoFilme.avaliacao;
+                else
+                filme.avaliacao = null
+            }));
+
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+                filme.generos = generoFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+                filme.elenco = atoresFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+                filme.diretor = diretoresFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+                filme.produtora = produtorasFilme;
+            }));
 
             if (dadosFilmes) {
 
