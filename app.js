@@ -143,6 +143,17 @@ app.get('/v2/AcmeFilmes/filmes/filtros/', cors(), async function(request, respon
         response.status(200)
 })
 
+app.get('/v2/AcmeFilmes/filmes/filtro/genero/:genero', cors(), async function(request, response){
+
+    let generoFilme = request.params.genero
+
+    //chama a função da controller para listar os filmes  com genero correspondente
+    let dadosFilmes = await controllerFilmes.getFiltrarFilmesGenero(generoFilme)
+
+        response.json(dadosFilmes)
+        response.status(200)
+})
+
 
 //insert
 app.post('/v2/AcmeFilmes/filme', cors(), bodyParserJSON, async function(request, response){

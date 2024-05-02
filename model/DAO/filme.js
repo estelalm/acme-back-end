@@ -9,6 +9,7 @@
 
 //Import da biblioteca do prisma client
 const { PrismaClient } = require('@prisma/client')
+const { selectByDiretorPais } = require('./pais')
 
 //Instância da classe prisma client
 const prisma = new PrismaClient
@@ -554,15 +555,61 @@ const selectByFiltro = async function (params) {
                 condition = `${key} like "%${params[key]}%"`
             }
         })
-        let sql = `select * from tbl_filme where ${condition}`
+        let sql = `select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme where ${condition}`
         rsFilmes = await prisma.$queryRawUnsafe(sql)
         return rsFilmes
 
     } catch (error) {
+        console.log(error)
         return false
     }
 
 }
+
+const selectFilmesByGenero = async function (id){
+    try {
+        let sql = `select tbl_filme.id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+        join tbl_genero_filme on tbl_filme.id=tbl_genero_filme.filme_id where genero_id = ${id}`
+
+        console.log(sql)
+        let rsFilme = await prisma.$queryRawUnsafe(sql)
+        return rsFilme
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
+const selectFilmesByAtor = async function (id){
+    try {
+        let sql = `select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+        join tbl_ator_filme on tbl_filme.id=tbl_ator_filme.id_filme where ator_id = ${id}`
+        let rsFilme = await prisma.$queryRawUnsafe(sql)
+        return rsFilme
+    } catch (error) {
+        return false
+    }
+}
+const selectFilmesByDiretor = async function (id){
+    try {
+        let sql = ` select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+        join tbl_diretor_filme on tbl_filme.id=tbl_diretor_filme.id_filme where diretor_id = ${id}`
+        let rsFilme = await prisma.$queryRawUnsafe(sql)
+        return rsFilme
+    } catch (error) {
+        return false
+    }
+}
+const selectFilmesByProdutora = async function (id){
+    try {
+        let sql = ` select id, nome, sinopse, duracao, data_lancamento, valor_unitario, foto_capa, trailer from tbl_filme 
+        join tbl_produtora_filme on tbl_filme.id=tbl_produtora_filme.id_filme where produtora_id = ${id}`
+        let rsFilme = await prisma.$queryRawUnsafe(sql)
+        return rsFilme
+    } catch (error) {
+        return false
+    }
+}
+
 
 const selectLastInsertId = async function () {
 
@@ -613,6 +660,10 @@ module.exports = {
     selectFilmesCompradosUsuario,
     selectFilmesSalvosUsuario,
     selectAvaliacaoFilme,
+    selectFilmesByAtor,
+    selectFilmesByGenero,
+    selectFilmesByDiretor,
+    selectFilmesByProdutora,
     deleteFilme,
     deleteAvaliacoesFilme,
     updateFilme

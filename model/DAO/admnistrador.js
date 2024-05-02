@@ -5,7 +5,7 @@ const prisma = new PrismaClient
 const selectAllAdmnistradores = async function (){
 
     try {
-        let sql = `select * from tbl_admnistradores`
+        let sql = `select * from tbl_admnistrador`
 
         let rsAdmnistradores = await prisma.$queryRawUnsafe(sql)
         return rsAdmnistradores
@@ -19,7 +19,7 @@ const selectByIdAdmnistrador = async function (id){
 
    try {
 
-     let sql = `select * from tbl_admnistradores where id = ${id}`
+     let sql = `select * from tbl_admnistrador where id = ${id}`
 
      let rsAdmnistrador = await prisma.$queryRawUnsafe(sql)
 
@@ -35,7 +35,7 @@ const insertAdmnistrador = async function (dadosAdmnistrador){
 
     try {
         
-        let sql = `INSERT INTO tbl_admnistradores 
+        let sql = `INSERT INTO tbl_admnistrador
         (nome, 
         login, 
         senha) values
@@ -61,7 +61,7 @@ const updateAdmnistrador = async function (id, dados){
 
     try{
 
-        let sql = `update tbl_admnistradores set 
+        let sql = `update tbl_admnistrador set 
         
         nome = '${dadosAdmnistrador.nome}',
         login = '${dadosAdmnistrador.login}',
@@ -88,7 +88,7 @@ const deleteAdmnistrador = async function (id){
     let idAdmnistrador = id
 
     try {
-        let sql = `delete from tbl_admnistradores where id = ${idAdmnistrador}`
+        let sql = `delete from tbl_admnistrador where id = ${idAdmnistrador}`
 
         let result = await prisma.$executeRawUnsafe(sql)
 
@@ -106,7 +106,7 @@ const deleteAdmnistrador = async function (id){
 const selectLastInsertId = async function () {
 
     try{
-    let sql = `select cast(last_insert_id() as DECIMAL) as id from tbl_admnistradores limit 1`
+    let sql = `select cast(last_insert_id() as DECIMAL) as id from tbl_admnistrador limit 1`
     let result = await prisma.$queryRawUnsafe(sql)
     
     let id
