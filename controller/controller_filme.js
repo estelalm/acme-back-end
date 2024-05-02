@@ -14,6 +14,7 @@ const controllerGeneros = require('../controller/controller_generos.js')
 const controllerAtores = require('../controller/controller_atores.js')
 const controllerDiretores = require('../controller/controller_diretores.js')
 const controllerProdutora = require('../controller/controller_produtoras.js')
+
 const { getFilmes } = require('./filmes_funcoes.js')
 
 //função para inserir um novo filme
@@ -716,6 +717,51 @@ const setInserirAvaliacaoFilme = async function (idFilme, contentType, dadosAval
 
 }
 
+const setAtualizarAvaliacaoFilme = async function (idFilme, contentType, dadosAvaliacao){
+
+    try {
+        if (String(contentType).toLowerCase() == 'application/json') {
+            //cria o objeto JSON para devolver os dados criados na requisição
+            let avaliacaoAtualizadaJSON = {}
+
+            let idUsuario = dadosAvaliacao.usuario
+            let avaliacao =  dadosAvaliacao.avaliacao
+
+            //validação de campos obrigatórios ou com digitação inválida
+            if (idFilme == "" || idFilme == undefined || isNaN(idFilme) 
+            || idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)
+            || avaliacao > 5 || avaliacao < 1
+            ) {
+                return message.ERROR_INVALID_ID
+            } else {
+
+                    let avaliacaoAtualizada = await filmesDAO.updateAvaliacaoFilme(idUsuario, idFilme, avaliacao)
+                    
+                    //validação para verificar se o DAO inseriu os dados no banco
+                    if (avaliacaoAtualizada) {
+                        //cria o JSON de retorno dos dados (201)
+                        // novoFilmeJSON.filme = filmeComprado
+                        avaliacaoAtualizadaJSON.status = message.SUCCESS_UPDATED_ITEM.status
+                        avaliacaoAtualizadaJSON.status_code = message.SUCCESS_UPDATED_ITEM.status_code
+                        avaliacaoAtualizadaJSON.message = message.SUCCESS_UPDATED_ITEM.message
+
+                        return avaliacaoAtualizadaJSON //201
+                    } else {
+                        return message.ERROR_INTERNAL_SERVER_DB //500
+                    }
+
+            }
+        } else {
+            return message.ERROR_CONTENT_TYPE
+        }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+
+}
+
 const setExcluirFilmeSalvo = async function (idUsuario, idFilme) {
 
     try {
@@ -786,7 +832,6 @@ const getFiltrarFilmes = async function (parametros) {
             let filmesJSON = {}
 
             let dadosFilmes = await filmesDAO.selectByFiltro(parametros)
-            console.log(dadosFilmes)
 
             await Promise.all(dadosFilmes.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
@@ -940,5 +985,6 @@ module.exports = {
     setExcluirFilmeComprado,
     setExcluirFilmeSalvo,
     setExcluirAvaliacaoFilme,
+    setAtualizarAvaliacaoFilme,
     setAtualizarFilme
 }

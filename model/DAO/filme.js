@@ -228,6 +228,28 @@ const insertAvaliacaoFilme = async function (idUsuario, idFilme, avaliacao){
         return false
     }
 }
+const updateAvaliacaoFilme = async function (idUsuario, idFilme, avaliacao){
+
+    let sql
+
+    try {
+            sql = `update tbl_avaliacao 
+                set avaliacao = ${avaliacao}
+                where usuario_id = ${idUsuario}
+                and filme_id = ${idFilme}`
+        
+        let result = await prisma.$executeRawUnsafe(sql)
+
+        if (result)
+            return true
+        else
+            return false
+
+    } catch (error) {
+        console.log(error)
+        return false
+    }
+}
 
 const deleteGeneroFilme = async function (idFilme){
 
@@ -645,6 +667,7 @@ module.exports = {
     insertAvaliacaoFilme,
     insertFilmeSalvo,
     updateFilme,
+    updateAvaliacaoFilme,
     deleteFilme,
     deleteAtorFilme,
     deleteDiretorFilme,
