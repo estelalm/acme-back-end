@@ -872,6 +872,7 @@ app.put('/v2/AcmeFilmes/admnistrador/:id', cors(), bodyParserJSON, async functio
 
 })
 
+
 //vercel
 app.get("/", (req, res) => res.send("Express on Vercel"));
 //app.listen na porta 8080
