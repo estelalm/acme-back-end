@@ -48,6 +48,7 @@ const controllerAtores = require('./controller/controller_atores.js')
 const controllerDiretores = require('./controller/controller_diretores.js')
 const controllerUsuarios = require('./controller/controller_usuario.js')
 const contollerAdmnistradores = require('./controller/controller_admnistradores.js')
+const controllerAvaliacoes = require('./controller/controller_avaliacao.js')
 //---------------------  import dos aquivos de controller do projeto ----------------------------------//
 
 //criando um objeto para controlar a chegada dos dados da reqisição em formato JSON
@@ -297,6 +298,19 @@ app.post('/v2/AcmeFilmes/filme/avaliacao/:id', cors(), bodyParserJSON, async fun
 
 })
 
+app.put('/v2/AcmeFilmes/filme/avaliacao/:id', cors(), bodyParserJSON, async function(request, response){
+
+    let idFilme = request.params.id
+    let dadosAvaliacao = request.body
+    let contentType = request.header('content-type')
+    //encaminha os dados para a controller enviar para o DAO
+    let resultDadosAvaliacao = await controllerFilmes.setAtualizarAvaliacaoFilme(idFilme, contentType, dadosAvaliacao)
+    
+    response.status(resultDadosAvaliacao.status_code)
+    response.json(resultDadosAvaliacao)
+
+})
+
 app.delete('/v2/AcmeFilmes/filme/avaliacoes/:id', cors(), bodyParserJSON, async function(request, response){
 
     let idFilme = request.params.id
@@ -305,6 +319,19 @@ app.delete('/v2/AcmeFilmes/filme/avaliacoes/:id', cors(), bodyParserJSON, async 
 
     response.json(avaliacaoDeletada)
     response.status(avaliacaoDeletada.status_code)
+})
+
+//avaliação de filmes por cada usuário
+app.get('/v2/AcmeFilmes/filme/avaliacao/usuario/:id', cors(), async function (request, response) {
+
+    let idUsuario = request.params.id
+
+    //chama a função da controller para listar o filme com id correspondente
+    let dadosFilme = await controllerAvaliacoes.getListarFilmesAvaliadosUsuario(idUsuario)
+
+        response.status(dadosFilme.status_code)
+        response.json(dadosFilme)
+
 })
 
 

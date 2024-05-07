@@ -14,6 +14,7 @@ const controllerGeneros = require('../controller/controller_generos.js')
 const controllerAtores = require('../controller/controller_atores.js')
 const controllerDiretores = require('../controller/controller_diretores.js')
 const controllerProdutora = require('../controller/controller_produtoras.js')
+
 const { getFilmes } = require('./filmes_funcoes.js')
 
 //função para inserir um novo filme
@@ -241,7 +242,7 @@ const getListarFilmes = async function () {
         //chama as funções que retornam outras informações do filme
         await Promise.all(dadosFilmes.map(async (filme) => {
             let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-            filme.classificacao = classificacaoFilme;
+            filme.classificacao = classificacaoFilme.classificacao;
         }));
 
         await Promise.all(dadosFilmes.map(async (filme) => {
@@ -321,13 +322,11 @@ const getBuscarFilme = async function (id) {
             let dadosFilme = await filmesDAO.selectByIdFilme(idFilme)
             
 
-            //this is saying dadosFilme is undefined, so is the filme.id
             await Promise.all(dadosFilme.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-                filme.classificacao = classificacaoFilme;
+                filme.classificacao = classificacaoFilme.classificacao;
             }));
     
-            //from here id doesn't get undefined, why is that??
             await Promise.all(dadosFilme.map(async (filme) => {
                 let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
                 filme.pais_origem = paisFilme;
@@ -399,7 +398,7 @@ const getFilmesCompradosUsuario = async function (idUsuario) {
                 //chama as funções que retornam outras informações do filme
                 await Promise.all(dadosFilmes.map(async (filme) => {
                     let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-                    filme.classificacao = classificacaoFilme;
+                    filme.classificacao = classificacaoFilme.classificacao;
                 }));
         
                 await Promise.all(dadosFilmes.map(async (filme) => {
@@ -525,7 +524,7 @@ const getFilmesSalvosUsuario = async function (idUsuario) {
                 //chama as funções que retornam outras informações do filme
                 await Promise.all(dadosFilmes.map(async (filme) => {
                     let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-                    filme.classificacao = classificacaoFilme;
+                    filme.classificacao = classificacaoFilme.classificacao;
                 }));
         
                 await Promise.all(dadosFilmes.map(async (filme) => {
@@ -716,6 +715,51 @@ const setInserirAvaliacaoFilme = async function (idFilme, contentType, dadosAval
 
 }
 
+const setAtualizarAvaliacaoFilme = async function (idFilme, contentType, dadosAvaliacao){
+
+    try {
+        if (String(contentType).toLowerCase() == 'application/json') {
+            //cria o objeto JSON para devolver os dados criados na requisição
+            let avaliacaoAtualizadaJSON = {}
+
+            let idUsuario = dadosAvaliacao.usuario
+            let avaliacao =  dadosAvaliacao.avaliacao
+
+            //validação de campos obrigatórios ou com digitação inválida
+            if (idFilme == "" || idFilme == undefined || isNaN(idFilme) 
+            || idUsuario == "" || idUsuario == undefined || isNaN(idUsuario)
+            || avaliacao > 5 || avaliacao < 1
+            ) {
+                return message.ERROR_INVALID_ID
+            } else {
+
+                    let avaliacaoAtualizada = await filmesDAO.updateAvaliacaoFilme(idUsuario, idFilme, avaliacao)
+                    
+                    //validação para verificar se o DAO inseriu os dados no banco
+                    if (avaliacaoAtualizada) {
+                        //cria o JSON de retorno dos dados (201)
+                        // novoFilmeJSON.filme = filmeComprado
+                        avaliacaoAtualizadaJSON.status = message.SUCCESS_UPDATED_ITEM.status
+                        avaliacaoAtualizadaJSON.status_code = message.SUCCESS_UPDATED_ITEM.status_code
+                        avaliacaoAtualizadaJSON.message = message.SUCCESS_UPDATED_ITEM.message
+
+                        return avaliacaoAtualizadaJSON //201
+                    } else {
+                        return message.ERROR_INTERNAL_SERVER_DB //500
+                    }
+
+            }
+        } else {
+            return message.ERROR_CONTENT_TYPE
+        }
+
+    } catch (error) {
+        console.log(error)
+        return message.ERROR_INTERNAL_SERVER
+    }
+
+}
+
 const setExcluirFilmeSalvo = async function (idUsuario, idFilme) {
 
     try {
@@ -754,6 +798,44 @@ const getBuscarNomeFilme = async function (nome) {
 
             let dadosFilmes = await filmesDAO.selectByNomeFilme(nomeFilme)
 
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
+                filme.classificacao = classificacaoFilme.classificacao;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let paisFilme = await controllerPaises.getPaisPorFilme(filme.id)
+                filme.pais_origem = paisFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let avaliacaoFilme = await getAvaliacaoFilme(filme.id);
+                if(avaliacaoFilme.avaliacao)
+                filme.avaliacao = avaliacaoFilme.avaliacao;
+                else
+                filme.avaliacao = null
+            }));
+
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let generoFilme = await controllerGeneros.getGeneroPorFilme(filme.id);
+                filme.generos = generoFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let atoresFilme = await controllerAtores.getAtorPorFilme(filme.id);
+                filme.elenco = atoresFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let diretoresFilme = await controllerDiretores.getDiretorPorFilme(filme.id);
+                filme.diretor = diretoresFilme;
+            }));
+    
+            await Promise.all(dadosFilmes.map(async (filme) => {
+                let produtorasFilme = await controllerProdutora.getProdutoraPorFilme(filme.id);
+                filme.produtora = produtorasFilme;
+            }));
+
             if (dadosFilmes) {
 
                 if (dadosFilmes.length > 0) {
@@ -786,7 +868,6 @@ const getFiltrarFilmes = async function (parametros) {
             let filmesJSON = {}
 
             let dadosFilmes = await filmesDAO.selectByFiltro(parametros)
-            console.log(dadosFilmes)
 
             await Promise.all(dadosFilmes.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
@@ -940,5 +1021,6 @@ module.exports = {
     setExcluirFilmeComprado,
     setExcluirFilmeSalvo,
     setExcluirAvaliacaoFilme,
+    setAtualizarAvaliacaoFilme,
     setAtualizarFilme
 }
