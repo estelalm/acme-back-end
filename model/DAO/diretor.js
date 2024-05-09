@@ -97,7 +97,9 @@ const insertDiretor = async function (dadosDiretor){
         else
             return false
 
+        
     } catch (error) {
+        
         console.log(error)
         return false
     }

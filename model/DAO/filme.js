@@ -192,9 +192,12 @@ const insertFilmeSalvo = async function (idUsuario, idFilme){
 
     let sql
 
+    
     try {
             sql = `insert into tbl_salvo ( usuario_id, filme_id ) values 
             ( ${idUsuario}, ${idFilme})`
+
+            console.log(sql)
         
         let result = await prisma.$executeRawUnsafe(sql)
 

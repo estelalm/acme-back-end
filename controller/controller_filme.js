@@ -871,7 +871,7 @@ const getFiltrarFilmes = async function (parametros) {
 
             await Promise.all(dadosFilmes.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-                filme.classificacao = classificacaoFilme;
+                filme.classificacao = classificacaoFilme.classificacao;
             }));
     
             await Promise.all(dadosFilmes.map(async (filme) => {
@@ -940,7 +940,7 @@ const getFiltrarFilmesGenero = async function (idGenero){
             //chama as funções que retornam outras informações do filme
             await Promise.all(dadosFilmes.map(async (filme) => {
                 let classificacaoFilme = await controllerClassificacoes.getBuscarClassficacaoFilme(filme.id)
-                filme.classificacao = classificacaoFilme;
+                filme.classificacao = classificacaoFilme.classificacao;
             }));
     
             await Promise.all(dadosFilmes.map(async (filme) => {

@@ -115,7 +115,7 @@ const getAtorPorFilme = async (id)=>{
 const setInserirNovoAtor = async function (dadosAtor, contentType) {
 
     try {
-        console.log(dadosAtor)
+        
         if (String(contentType).toLowerCase() == 'application/json') {  
 
             let novoAtorJSON = {}
@@ -128,7 +128,7 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
             ) {
                 return message.ERROR_REQUIRED_FIELDS
             } else {
-
+                
                 let validateFalecimento = false
                 let validateFoto = false
 
@@ -152,8 +152,9 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
                 } else {
                     validateFoto = true
                 }
-
+                
                     if(validateFalecimento && validateFoto){
+                        
                         let novoAtor = await atoresDAO.insertAtor(dadosAtor)
                         let idNovoAtor = await atoresDAO.selectLastInsertId()
 
@@ -175,7 +176,7 @@ const setInserirNovoAtor = async function (dadosAtor, contentType) {
     
                             return novoAtorJSON 
                         } else {
-                            console.log(dadosAtor)
+                            
                             return message.ERROR_INTERNAL_SERVER_DB 
                         }
                     }

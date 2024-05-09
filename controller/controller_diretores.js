@@ -160,7 +160,6 @@ const setInserirNovoDiretor = async function (dadosDiretor, contentType) {
 
                         let novaNacionalidadeDiretor 
 
-                        console.log(dadosDiretor)
                         dadosDiretor.nacionalidade.forEach(async idNacionalidade =>{
                             if(!isNaN(idNacionalidade))
                             novaNacionalidadeDiretor = await diretoresDAO.insertNacionalidadeDiretor(idNovoDiretor, idNacionalidade)

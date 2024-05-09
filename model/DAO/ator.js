@@ -26,7 +26,7 @@ const selectByIdAtor = async function (id){
      return rsAtor
 
    } catch (error) {
-    
+    console.log(error)
     return false
    }
     
@@ -52,6 +52,7 @@ const selectByFilmeAtor = async (id) =>{
         return false
 
     }catch(error){
+        console.log(error)
         return false
     }
 
@@ -74,8 +75,8 @@ const insertAtor = async function (dadosAtor){
             fotoAtor = null
         }
 
-        let sql
-            sql = `INSERT INTO tbl_ator 
+
+        let sql = `INSERT INTO tbl_ator 
             (nome, 
             nome_artistico, 
             data_nascimento, 
@@ -89,6 +90,8 @@ const insertAtor = async function (dadosAtor){
             '${dadosAtor.biografia}',
              ${fotoAtor}
         )`
+
+    
         let result = await prisma.$executeRawUnsafe(sql)
 
         if(result)
@@ -97,6 +100,7 @@ const insertAtor = async function (dadosAtor){
             return false
 
     } catch (error) {
+        console.log('sssss')
         console.log(error)
         return false
     }
@@ -105,7 +109,7 @@ const insertAtor = async function (dadosAtor){
 const insertNacionalidadeAtor = async function(idAtor, idNacionalidade){
 
     try {
-
+        
         let sql = `INSERT INTO tbl_nacionalidade_ator 
             (ator_id, pais_id) values
             ('${idAtor}', ${idNacionalidade})`
