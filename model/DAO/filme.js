@@ -348,7 +348,7 @@ const updateFilme = async function (id, dados) {
         sql = `update tbl_filme set 
         
             nome = '${dadosFilme.nome}',
-            sinopse = '${dadosFilme.sinopse}', 
+            sinopse = "${dadosFilme.sinopse}", 
             duracao = '${dadosFilme.duracao}',
             data_lancamento = '${dadosFilme.data_lancamento}',
             data_relancamento = ${dadosFilme.data_relancamento},
@@ -363,7 +363,7 @@ const updateFilme = async function (id, dados) {
         sql = `update tbl_filme set 
         
         nome = '${dadosFilme.nome}',
-        sinopse = '${dadosFilme.sinopse}', 
+        sinopse = "${dadosFilme.sinopse}", 
         duracao = '${dadosFilme.duracao}',
         data_lancamento = '${dadosFilme.data_lancamento}',
         data_relancamento = null,
